@@ -1,0 +1,143 @@
+// ============================================================
+// TINY WEDDING GAME – SPRITE SYSTEM
+// Handles sprite loading, caching, animation, and drawing.
+// Falls back to colored rectangles when sprites aren't loaded.
+// ============================================================
+
+// --- Sprite Sheet Definitions ---
+// Each key defines a sprite sheet: source image, frame dimensions, and animations.
+// Animations are rows in the sheet; frames are columns.
+const SPRITE_SHEETS = {
+  player: {
+    src: "assets/sprites/player.png",
+    frameWidth: 16,
+    frameHeight: 32,
+    // Row 1 = idle (right 0-5, up 6-11, left 12-17, down 18-23)
+    // Row 2 = run  (right 0-5, up 6-11, left 12-17, down 18-23)
+    animations: {
+      idle_down:  { row: 1, col: 18, frames: 6, speed: 120 },
+      walk_down:  { row: 2, col: 18, frames: 6, speed: 120 },
+      idle_up:    { row: 1, col: 6,  frames: 6, speed: 120 },
+      walk_up:    { row: 2, col: 6,  frames: 6, speed: 120 },
+      idle_left:  { row: 1, col: 12, frames: 6, speed: 120 },
+      walk_left:  { row: 2, col: 12, frames: 6, speed: 120 },
+      idle_right: { row: 1, col: 0,  frames: 6, speed: 120 },
+      walk_right: { row: 2, col: 0,  frames: 6, speed: 120 },
+    },
+  },
+  heart: {
+    src: "assets/sprites/items.png",
+    frameWidth: 16,
+    frameHeight: 16,
+    animations: {
+      pulse: { row: 1, col: 7, frames: 1, speed: 0 },
+    },
+  },
+};
+
+// --- Sprite Loader ---
+const SpriteLoader = {
+  cache: {},
+  loading: {},
+  failed: new Set(),
+
+  load(src) {
+    if (this.cache[src]) return Promise.resolve(this.cache[src]);
+    if (this.loading[src]) return this.loading[src];
+
+    const promise = new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        this.cache[src] = img;
+        delete this.loading[src];
+        resolve(img);
+      };
+      img.onerror = () => {
+        this.failed.add(src);
+        delete this.loading[src];
+        reject(new Error("Failed to load: " + src));
+      };
+      img.src = src;
+    });
+
+    this.loading[src] = promise;
+    return promise;
+  },
+
+  get(src) {
+    return this.cache[src] || null;
+  },
+
+  isLoaded(src) {
+    return src in this.cache;
+  },
+
+  preloadAll(sheetDefs) {
+    const promises = Object.values(sheetDefs).map((def) => this.load(def.src));
+    return Promise.allSettled(promises);
+  },
+};
+
+// --- Sprite Animation State ---
+function createSpriteAnimation(sheetKey, initialAnimation) {
+  return {
+    sheetKey: sheetKey,
+    currentAnim: initialAnimation,
+    frameIndex: 0,
+    elapsed: 0,
+  };
+}
+
+function updateSpriteAnimation(anim, deltaTime) {
+  const sheet = SPRITE_SHEETS[anim.sheetKey];
+  if (!sheet) return;
+
+  const animDef = sheet.animations[anim.currentAnim];
+  if (!animDef || animDef.speed === 0 || animDef.frames <= 1) return;
+
+  anim.elapsed += deltaTime;
+  if (anim.elapsed >= animDef.speed) {
+    anim.elapsed -= animDef.speed;
+    anim.frameIndex = (anim.frameIndex + 1) % animDef.frames;
+  }
+}
+
+function setSpriteAnimation(anim, newAnim) {
+  if (anim.currentAnim === newAnim) return;
+  anim.currentAnim = newAnim;
+  anim.frameIndex = 0;
+  anim.elapsed = 0;
+}
+
+// --- Drawing ---
+function drawSprite(ctx, anim, x, y, width, height, fallbackColor) {
+  const sheet = SPRITE_SHEETS[anim.sheetKey];
+  const img = sheet ? SpriteLoader.get(sheet.src) : null;
+
+  if (img && sheet) {
+    const animDef = sheet.animations[anim.currentAnim];
+    if (!animDef) {
+      drawFallbackRect(ctx, x, y, width, height, fallbackColor);
+      return;
+    }
+
+    const fw = animDef.frameWidth || sheet.frameWidth;
+    const fh = animDef.frameHeight || sheet.frameHeight;
+    const colOffset = animDef.col || 0;
+    const sx = (colOffset + anim.frameIndex) * fw;
+    const sy = animDef.row * sheet.frameHeight;
+
+    ctx.drawImage(
+      img,
+      sx, sy, fw, fh,
+      x - width / 2, y - height / 2, width, height
+    );
+  } else {
+    drawFallbackRect(ctx, x, y, width, height, fallbackColor);
+  }
+}
+
+function drawFallbackRect(ctx, x, y, width, height, color) {
+  ctx.fillStyle = color;
+  ctx.fillRect(x - width / 2, y - height / 2, width, height);
+}

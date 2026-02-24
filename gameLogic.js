@@ -7,25 +7,19 @@ function updatePlayerPosition(player, keysPressed) {
   let dx = 0;
   let dy = 0;
 
-  if (keysPressed.ArrowUp) dy -= 1;
-  if (keysPressed.ArrowDown) dy += 1;
-  if (keysPressed.ArrowLeft) dx -= 1;
-  if (keysPressed.ArrowRight) dx += 1;
-
-  // Normalize diagonal movement
-  if (dx !== 0 && dy !== 0) {
-    const len = Math.sqrt(dx * dx + dy * dy);
-    dx /= len;
-    dy /= len;
+  if(keysPressed.ArrowUp){
+    player.y = player.y-1
+  }
+    if(keysPressed.ArrowDown){
+    player.y = player.y+1
+  }
+      if(keysPressed.ArrowLeft){
+    player.x = player.x-1
+  }
+      if(keysPressed.ArrowRight){
+    player.x = player.x+1
   }
 
-  player.x += dx * player.speed;
-  player.y += dy * player.speed;
-
-  // Keep player inside canvas bounds
-  const half = player.size / 2;
-  player.x = Math.max(half, Math.min(CANVAS_WIDTH - half, player.x));
-  player.y = Math.max(half, Math.min(CANVAS_HEIGHT - half, player.y));
 }
 
 function checkHeartCollection(player, hearts) {

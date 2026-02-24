@@ -62,7 +62,7 @@ gameLoop() → updatePlayerPosition(player, keysPressed)
 
 ## Key Globals (defined in engine.js, available in gameLogic.js)
 
-- `CANVAS_WIDTH` (800), `CANVAS_HEIGHT` (600)
+- `CANVAS_WIDTH` (1280), `CANVAS_HEIGHT` (720)
 - `player` — `{ x, y, size: 30, speed: 3 }` — position is CENTER of the square
 - `hearts` — array of `{ x, y, size: 20, points: 1 }` — position is CENTER
 - `keysPressed` — `{ ArrowUp, ArrowDown, ArrowLeft, ArrowRight }` booleans

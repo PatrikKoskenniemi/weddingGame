@@ -1,11 +1,11 @@
 // ============================================================
 // TINY WEDDING GAME – ENGINE
-// This file is FULLY IMPLEMENTED. DO NOT MODIFY.
 // ============================================================
 
 // --- Canvas Setup ---
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
+ctx.imageSmoothingEnabled = false;
 const CANVAS_WIDTH = canvas.width;
 const CANVAS_HEIGHT = canvas.height;
 
@@ -13,8 +13,11 @@ const CANVAS_HEIGHT = canvas.height;
 const player = {
   x: CANVAS_WIDTH / 2,
   y: CANVAS_HEIGHT / 2,
-  size: 30,
-  speed: 3,
+  size: 48,
+  speed: 4,
+  sprite: createSpriteAnimation("player", "idle_down"),
+  _prevX: CANVAS_WIDTH / 2,
+  _prevY: CANVAS_HEIGHT / 2,
 };
 
 let score = 0;
@@ -26,8 +29,9 @@ function spawnHearts(count) {
     hearts.push({
       x: Math.random() * (CANVAS_WIDTH - 40) + 20,
       y: Math.random() * (CANVAS_HEIGHT - 40) + 20,
-      size: 20,
+      size: 32,
       points: 1,
+      sprite: createSpriteAnimation("heart", "pulse"),
     });
   }
 }
@@ -56,26 +60,35 @@ window.addEventListener("keyup", (e) => {
   }
 });
 
+// --- Player Direction Detection ---
+function updatePlayerDirection() {
+  const dx = player.x - player._prevX;
+  const dy = player.y - player._prevY;
+  const moving = dx !== 0 || dy !== 0;
+
+  if (moving) {
+    if (Math.abs(dx) >= Math.abs(dy)) {
+      setSpriteAnimation(player.sprite, dx > 0 ? "walk_right" : "walk_left");
+    } else {
+      setSpriteAnimation(player.sprite, dy > 0 ? "walk_down" : "walk_up");
+    }
+  } else {
+    const dir = player.sprite.currentAnim.replace("walk_", "").replace("idle_", "");
+    setSpriteAnimation(player.sprite, "idle_" + dir);
+  }
+
+  player._prevX = player.x;
+  player._prevY = player.y;
+}
+
 // --- Rendering ---
 function drawPlayer() {
-  ctx.fillStyle = "#4488ff";
-  ctx.fillRect(
-    player.x - player.size / 2,
-    player.y - player.size / 2,
-    player.size,
-    player.size
-  );
+  drawSprite(ctx, player.sprite, player.x, player.y, player.size, player.size * 2, "#4488ff");
 }
 
 function drawHearts() {
-  ctx.fillStyle = "#ff6699";
   for (const heart of hearts) {
-    ctx.fillRect(
-      heart.x - heart.size / 2,
-      heart.y - heart.size / 2,
-      heart.size,
-      heart.size
-    );
+    drawSprite(ctx, heart.sprite, heart.x, heart.y, heart.size, heart.size, "#ff6699");
   }
 }
 
@@ -107,10 +120,24 @@ function checkRespawn() {
 }
 
 // --- Game Loop ---
-function gameLoop() {
+let lastTime = performance.now();
+
+function gameLoop(currentTime) {
+  const deltaTime = currentTime - lastTime;
+  lastTime = currentTime;
+
   // Update logic (calls functions from gameLogic.js)
   updatePlayerPosition(player, keysPressed);
   score += checkHeartCollection(player, hearts);
+
+  // Detect player facing direction for sprite animation
+  updatePlayerDirection();
+
+  // Update sprite animations
+  updateSpriteAnimation(player.sprite, deltaTime);
+  for (const heart of hearts) {
+    updateSpriteAnimation(heart.sprite, deltaTime);
+  }
 
   // Respawn hearts when all collected
   checkRespawn();
@@ -121,5 +148,7 @@ function gameLoop() {
   requestAnimationFrame(gameLoop);
 }
 
-// Start the game
-gameLoop();
+// --- Start ---
+SpriteLoader.preloadAll(SPRITE_SHEETS).then(() => {
+  requestAnimationFrame(gameLoop);
+});
