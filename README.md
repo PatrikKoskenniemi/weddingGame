@@ -2,74 +2,74 @@
 
 Hej brudparet!
 
-Det har finns ett litet spel som vi har byggt till er. Ni ska live-koda spellogiken tillsammans pa scenen medan alla tittar pa storbilden. Inga panik — det ar lattare an det later!
+Det här finns ett litet spel som vi har byggt till er. Ni ska live-koda spellogiken tillsammans på scenen medan alla tittar på storbilden. Inga panik — det är lättare än det låter!
 
 ## Hur funkar det?
 
-Spelet ar redan byggt och kors i webblasaren. Allt renderas, figuren syns, hjartan poppar upp — men ingenting funkar an! Det ar dar ni kommer in.
+Spelet är redan byggt och körs i webbläsaren. Allt renderas, figuren syns, hjärtan poppar upp — men ingenting funkar än! Det är där ni kommer in.
 
-Ni ska skriva koden som far spelet att fungera. Ni behover bara rora **en enda fil**:
+Ni ska skriva koden som får spelet att fungera. Ni behöver bara röra **en enda fil**:
 
 ```
 gameLogic.js
 ```
 
-Det ar er fil. Allt annat ar fardigbyggt.
+Det är er fil. Allt annat är färdigbyggt.
 
-## Hur kor man spelet?
+## Hur kör man spelet?
 
-1. Oppna en terminal i projektmappen
-2. Kor: `python3 -m http.server 8080`
-3. Oppna `http://localhost:8080` i Chrome
-4. Tryck F5 for att ladda om efter ni andrat koden
+1. Öppna en terminal i projektmappen
+2. Kör: `python3 -m http.server 8080`
+3. Öppna `http://localhost:8080` i Chrome
+4. Tryck F5 för att ladda om efter ni ändrat koden
 
-Ni behover aldrig stanga servern — bara spara filen och tryck F5!
+Ni behöver aldrig stänga servern — bara spara filen och tryck F5!
 
-## Vad ska ni gora?
+## Vad ska ni göra?
 
-I `gameLogic.js` finns tva funktioner som ni ska implementera:
+I `gameLogic.js` finns två funktioner som ni ska implementera:
 
 ### 1. `updatePlayerPosition(player, keysPressed)`
 
-Fa figuren att rora sig med piltangenterna!
+Få figuren att röra sig med piltangenterna!
 
-Ni har tillgang till:
+Ni har tillgång till:
 - `player.x` och `player.y` — figurens position (mitten)
-- `player.speed` — hur snabbt figuren ror sig (4)
-- `keysPressed.ArrowUp`, `keysPressed.ArrowDown`, `keysPressed.ArrowLeft`, `keysPressed.ArrowRight` — `true` om tangenten ar nedtryckt
+- `player.speed` — hur snabbt figuren rör sig (4)
+- `keysPressed.ArrowUp`, `keysPressed.ArrowDown`, `keysPressed.ArrowLeft`, `keysPressed.ArrowRight` — `true` om tangenten är nedtryckt
 
 Tips:
-- Flytta `player.x` och `player.y` baserat pa vilka tangenter som ar nedtryckta
-- Anvand `player.speed` for att bestamma hur langt figuren ror sig
-- Se till att figuren inte gar utanfor skarmkanten! Anvand `CANVAS_WIDTH` (1280) och `CANVAS_HEIGHT` (720)
-- Bonusutmaning: om man gar diagonalt (tva tangenter samtidigt) ska man inte ga snabbare
+- Flytta `player.x` och `player.y` baserat på vilka tangenter som är nedtryckta
+- Använd `player.speed` för att bestämma hur långt figuren rör sig
+- Se till att figuren inte går utanför skärmkanten! Använd `CANVAS_WIDTH` (1280) och `CANVAS_HEIGHT` (720)
+- Bonusutmaning: om man går diagonalt (två tangenter samtidigt) ska man inte gå snabbare
 
 ### 2. `checkHeartCollection(player, hearts)`
 
-Samla hjartan och fa poang!
+Samla hjärtan och få poäng!
 
-Ni har tillgang till:
+Ni har tillgång till:
 - `player.x`, `player.y`, `player.size` — figurens position och storlek
-- `hearts` — en lista med hjartan, varje hjarta har `x`, `y`, `size` och `points`
+- `hearts` — en lista med hjärtan, varje hjärta har `x`, `y`, `size` och `points`
 
-Vad funktionen ska gora:
-- Kolla om figuren overlappar nagot hjarta
-- Ta bort hjartan som samlats in fran listan
-- Returnera hur manga poang ni fick den har bildrutan
+Vad funktionen ska göra:
+- Kolla om figuren överlappar något hjärta
+- Ta bort hjärtan som samlats in från listan
+- Returnera hur många poäng ni fick den här bildrutan
 
 Tips:
-- Tva objekt overlappar om avstandet mellan dem ar mindre an summan av deras halva storlekar
-- Anvand `hearts.splice(i, 1)` for att ta bort ett hjarta fran listan
-- Glomd inte att returnera poangen! (inte bara `0`)
+- Två objekt överlappar om avståndet mellan dem är mindre än summan av deras halva storlekar
+- Använd `hearts.splice(i, 1)` för att ta bort ett hjärta från listan
+- Glöm inte att returnera poängen! (inte bara `0`)
 
 ## Fusklapp
 
-Dessa variabler finns tillgangliga overallt i `gameLogic.js`:
+Dessa variabler finns tillgängliga överallt i `gameLogic.js`:
 
-| Variabel | Varde | Beskrivning |
+| Variabel | Värde | Beskrivning |
 |----------|-------|-------------|
-| `CANVAS_WIDTH` | 1280 | Skarmens bredd |
-| `CANVAS_HEIGHT` | 720 | Skarmens hojd |
+| `CANVAS_WIDTH` | 1280 | Skärmens bredd |
+| `CANVAS_HEIGHT` | 720 | Skärmens höjd |
 | `player.x` | | Figurens x-position (mitten) |
 | `player.y` | | Figurens y-position (mitten) |
 | `player.size` | 48 | Figurens storlek |
