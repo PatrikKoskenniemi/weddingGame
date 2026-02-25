@@ -70,7 +70,7 @@ Each room should have a unique player character that fits the life stage. The ch
 - Move with arrow keys
 - Normalize diagonal movement
 - Stay inside bounds
-**Visuals:** Pastel colors, pacifiers or rattles as decorations, soft feel
+**Visuals:** Nursery/children's bedroom — herringbone wood floor, textured walls, crib or bunk bed, star garlands, toys on the floor, wardrobe, rug. Reference: https://img.itch.zone/aW1hZ2UvNjcxNzUxLzU5MzE1NTIuZ2lm/original/acGm9v.gif
 **Difficulty:** Easy
 **Status:** ✅ CONFIRMED
 

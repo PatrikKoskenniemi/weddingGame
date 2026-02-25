@@ -8,16 +8,16 @@ function updatePlayerPosition(player, keysPressed) {
   let dy = 0;
 
   if(keysPressed.ArrowUp){
-    player.y = player.y-1
+    player.y = player.y-2
   }
     if(keysPressed.ArrowDown){
-    player.y = player.y+1
+    player.y = player.y+2
   }
       if(keysPressed.ArrowLeft){
-    player.x = player.x-1
+    player.x = player.x-2
   }
       if(keysPressed.ArrowRight){
-    player.x = player.x+1
+    player.x = player.x+2
   }
 
 }

@@ -25,10 +25,16 @@ let score = 0;
 let hearts = [];
 
 function spawnHearts(count) {
+  const room = ROOM_NURSERY;
+  const margin = 40;
+  const minX = room.roomX + margin;
+  const maxX = room.roomX + room.roomW - margin;
+  const minY = room.roomY + room.wallHeight + margin;
+  const maxY = room.roomY + room.roomH - margin;
   for (let i = 0; i < count; i++) {
     hearts.push({
-      x: Math.random() * (CANVAS_WIDTH - 40) + 20,
-      y: Math.random() * (CANVAS_HEIGHT - 40) + 20,
+      x: Math.random() * (maxX - minX) + minX,
+      y: Math.random() * (maxY - minY) + minY,
       size: 32,
       points: 1,
       sprite: createSpriteAnimation("heart", "pulse"),
@@ -101,8 +107,7 @@ function drawScore() {
 }
 
 function drawBackground() {
-  ctx.fillStyle = "#1a1a2e";
-  ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+  drawRoomBackground();
 }
 
 function render() {
@@ -149,6 +154,12 @@ function gameLoop(currentTime) {
 }
 
 // --- Start ---
-SpriteLoader.preloadAll(SPRITE_SHEETS).then(() => {
+// Preload all sprite sheets + tilesets, then compose room and start
+const allLoads = [
+  SpriteLoader.preloadAll(SPRITE_SHEETS),
+  ...Object.values(TILESETS).map((t) => SpriteLoader.load(t.src)),
+];
+Promise.allSettled(allLoads).then(() => {
+  roomBackground = composeRoom(ROOM_NURSERY);
   requestAnimationFrame(gameLoop);
 });
