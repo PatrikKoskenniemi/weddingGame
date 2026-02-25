@@ -1,250 +1,193 @@
 // ============================================================
-// TINY WEDDING GAME – ROOM RENDERER
-// Composes a room background from tilesets onto an offscreen canvas.
+// TINY WEDDING GAME – ROOM RENDERER (Tiled Map Loader)
+// Loads a Tiled JSON map and composes the room onto an
+// offscreen canvas. Drawn once, then blitted each frame.
 // ============================================================
-
-const TILESETS = {
-  floors:           { src: "assets/sprites/floors.png" },
-  walls:            { src: "assets/sprites/walls.png" },         // 512x640
-  bedside_table:    { src: "assets/sprites/bedside_table.png" },    // 32x48
-  chair:            { src: "assets/sprites/chair.png" },            // 16x32
-  crib:             { src: "assets/sprites/crib.png" },             // 32x32
-  curtain_bedroom:  { src: "assets/sprites/curtain_bedroom.png" },  // 32x32
-  doll:             { src: "assets/sprites/doll.png" },             // 32x32
-  dollhouse:        { src: "assets/sprites/dollhouse.png" },        // 32x32
-  drawer:           { src: "assets/sprites/drawer.png" },           // 16x32
-  hanging_glitter:  { src: "assets/sprites/hanging_glitter.png" },  // 32x32
-  lamp_button:      { src: "assets/sprites/lamp_button.png" },      // 16x16
-  teddy_paddington: { src: "assets/sprites/teddy_bear_paddington.png" }, // 16x32
-  wardrobe_messy:   { src: "assets/sprites/wardrobe_messy.png" },   // 32x48
-  playmat_left:     { src: "assets/sprites/playmat_left.png" },     // 32x48
-  playmat_right:    { src: "assets/sprites/playmat_right.png" },    // 32x48
-  poster_solarsystem_left:   { src: "assets/sprites/poster_solarsystem_left.png" },   // 32x32
-  poster_solarsystem_middle: { src: "assets/sprites/poster_solarsystem_middle.png" }, // 16x32
-  poster_solarsystem_right:  { src: "assets/sprites/poster_solarsystem_right.png" },  // 16x32
-  table_left:       { src: "assets/sprites/table_left.png" },       // 16x32
-  table_right:      { src: "assets/sprites/table_right.png" },      // 16x32
-  teddy_bear:       { src: "assets/sprites/teddy_bear.png" },       // 16x32
-  train_2:          { src: "assets/sprites/train_2.png" },          // 32x16
-  car_red:          { src: "assets/sprites/car_red.png" },          // 16x16
-  train:            { src: "assets/sprites/train.png" },            // 32x16
-  wardrobe_big:     { src: "assets/sprites/wardrobe_big.png" },     // 32x48
-  window_left:      { src: "assets/sprites/window_left.png" },      // 32x48
-  window_right:     { src: "assets/sprites/window_right.png" },     // 16x48
-};
 
 const T = 16; // tile size in source sheets
 const S = 3;  // render scale (16px source → 48px game)
 
-// --- Room Definition: Nursery ---
-const ROOM_NURSERY = {
-  // Colors extracted from Room_Builder_Walls_16x16 blue wall tile (x=352, y=128)
-  wallColor: "#86b8df",       // sky blue wall body
-  floorColor: "#a08c73",
-  borderColor: "#3a3a50",     // dark frame around room
-  ceiling: {
-    molding: "#f8f8f8",       // white ceiling molding
-    border: "#3a3a50",        // dark line above/below molding
-    height: 4,                // molding height in source px
-  },
-  baseboard: {
-    colors: ["#e0b870", "#c78c59", "#c78c59", "#b5754d"],
-    border: "#3a3a50",
-  },
+// Tileset definitions matching the Tiled map's tilesets.
+// firstgid + columns come from the .tsx files referenced in nursery.json.
+const MAP_TILESETS = [
+  { name: "Room_Builder", firstgid: 1,    columns: 76, src: "assets/tilesets/room_builder.png" },
+  { name: "Fishing",      firstgid: 8589, columns: 16, src: "assets/tilesets/fishing.png" },
+  { name: "Bedroom",      firstgid: 9021, columns: 16, src: "assets/tilesets/bedroom.png" },
+];
 
-  roomX: 240,
-  roomY: 120,
-  roomW: 800,
-  roomH: 480,
-  wallHeight: 140,
+// Room bounds — set after map loads, used by engine for heart spawning
+let ROOM_BOUNDS = { x: 0, y: 0, w: 0, h: 0, wallHeight: 0 };
 
-  // Floor tile from floors.png — light diagonal parquet (row 18, col 1, 48x32)
-  floorTile: { tileset: "floors", sx: 0, sy: 544, sw: 48, sh: 32 },
-
-  // Room: x=240..1040, wall y=120..260, floor y=260..592
-
-  furniture: [
-    // === WALL DECORATIONS (on the wall, y=120..260) ===
-
-    // Window — left area
-    { tileset: "window_left", sx: 0, sy: 0, sw: 32, sh: 48, dx: 340, dy: 125 },
-    { tileset: "window_right", sx: 0, sy: 0, sw: 16, sh: 48, dx: 436, dy: 125 },
-
-    // Hanging glitter
-    { tileset: "hanging_glitter", sx: 0, sy: 0, sw: 32, sh: 32, dx: 350, dy: 126 },
-
-    // Poster solar system — 2 pieces adjacent
-    { tileset: "poster_solarsystem_left", sx: 0, sy: 0, sw: 32, sh: 32, dx: 614, dy: 148 },
-    { tileset: "poster_solarsystem_right", sx: 0, sy: 0, sw: 16, sh: 32, dx: 710, dy: 148 },
-
-    // Window — right area (behind curtain, drawn first)
-    { tileset: "window_left", sx: 0, sy: 0, sw: 32, sh: 48, dx: 848, dy: 122 },
-    { tileset: "window_right", sx: 0, sy: 0, sw: 16, sh: 48, dx: 944, dy: 122 },
-
-    // Curtain — over right window
-    { tileset: "curtain_bedroom", sx: 0, sy: 0, sw: 32, sh: 32, dx: 872, dy: 140 },
-
-    // === LARGE FURNITURE (against wall, straddling floor line y=260) ===
-
-    // Wardrobe big — far left
-    { tileset: "wardrobe_big", sx: 0, sy: 0, sw: 32, sh: 48, dx: 255, dy: 164 },
-
-    // Crib — lower-left corner of floor
-    { tileset: "crib", sx: 0, sy: 0, sw: 32, sh: 32, dx: 284, dy: 456 },
-
-    // Bedside table + lamp
-    { tileset: "bedside_table", sx: 0, sy: 0, sw: 32, sh: 48, dx: 548, dy: 164 },
-    { tileset: "lamp_button", sx: 0, sy: 0, sw: 16, sh: 16, dx: 564, dy: 172 },
-
-    // Dollhouse
-    { tileset: "dollhouse", sx: 0, sy: 0, sw: 32, sh: 32, dx: 680, dy: 212 },
-
-    // Wardrobe messy
-    { tileset: "wardrobe_messy", sx: 0, sy: 0, sw: 32, sh: 48, dx: 812, dy: 164 },
-
-    // Drawer — far right
-    { tileset: "drawer", sx: 0, sy: 0, sw: 16, sh: 32, dx: 944, dy: 212 },
-
-    // === FLOOR ITEMS ===
-
-    // Playmat — center
-    { tileset: "playmat_left", sx: 0, sy: 0, sw: 32, sh: 48, dx: 530, dy: 350 },
-    { tileset: "playmat_right", sx: 0, sy: 0, sw: 32, sh: 48, dx: 626, dy: 350 },
-
-    // Train — on playmat top-left corner
-    { tileset: "train", sx: 0, sy: 0, sw: 32, sh: 16, dx: 530, dy: 350 },
-
-    // Table — left floor area
-    { tileset: "table_left", sx: 0, sy: 0, sw: 16, sh: 32, dx: 310, dy: 370 },
-    { tileset: "table_right", sx: 0, sy: 0, sw: 16, sh: 32, dx: 358, dy: 370 },
-
-    // Chair — next to table
-    { tileset: "chair", sx: 0, sy: 0, sw: 16, sh: 32, dx: 406, dy: 380 },
-
-    // Teddy bear — near crib on floor
-    { tileset: "teddy_bear", sx: 0, sy: 0, sw: 16, sh: 32, dx: 460, dy: 300 },
-
-    // Teddy bear Paddington — near table
-    { tileset: "teddy_paddington", sx: 0, sy: 0, sw: 16, sh: 32, dx: 340, dy: 310 },
-
-    // Doll — right floor area
-    { tileset: "doll", sx: 0, sy: 0, sw: 32, sh: 32, dx: 740, dy: 420 },
-
-    // Train 2 — right floor
-    { tileset: "train_2", sx: 0, sy: 0, sw: 32, sh: 16, dx: 850, dy: 400 },
-
-    // Red car — near table
-    { tileset: "car_red", sx: 0, sy: 0, sw: 16, sh: 16, dx: 380, dy: 470 },
-  ],
-};
-
-// --- Room Composition ---
 let roomBackground = null;
 
-function composeRoom(roomDef) {
+// --- GID Resolution ---
+
+// Tiled stores flip flags in the high bits of tile GIDs
+const FLIP_H = 0x80000000;
+const FLIP_V = 0x40000000;
+const FLIP_D = 0x20000000;
+const GID_MASK = ~(FLIP_H | FLIP_V | FLIP_D);
+
+// Find which tileset a GID belongs to (search from highest firstgid down)
+function findTileset(gid) {
+  for (let i = MAP_TILESETS.length - 1; i >= 0; i--) {
+    if (gid >= MAP_TILESETS[i].firstgid) return MAP_TILESETS[i];
+  }
+  return null;
+}
+
+// Resolve a GID to { img, sx, sy } source rect (one T×T tile)
+function resolveGid(gid) {
+  const rawGid = gid & GID_MASK;
+  if (rawGid === 0) return null;
+
+  const ts = findTileset(rawGid);
+  if (!ts) return null;
+
+  const localId = rawGid - ts.firstgid;
+  const col = localId % ts.columns;
+  const row = Math.floor(localId / ts.columns);
+  const img = SpriteLoader.get(ts.src);
+
+  return img ? { img, sx: col * T, sy: row * T } : null;
+}
+
+// --- Map Loading ---
+
+async function loadMap(url) {
+  const resp = await fetch(url + "?v=" + Date.now());
+  return resp.json();
+}
+
+// --- Room Composition ---
+
+function composeRoom(mapData) {
   const offscreen = document.createElement("canvas");
   offscreen.width = CANVAS_WIDTH;
   offscreen.height = CANVAS_HEIGHT;
   const rc = offscreen.getContext("2d");
   rc.imageSmoothingEnabled = false;
 
-  const { roomX, roomY, roomW, roomH, wallHeight } = roomDef;
-
   // Dark surround
   rc.fillStyle = "#1a1a2e";
   rc.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-  // Floor — base color then tiled overlay
-  const floorTop = roomY + wallHeight;
-  const floorBottom = roomY + roomH - 8;
-  const floorLeft = roomX + 8;
-  const floorRight = roomX + roomW - 8;
+  const mapW = mapData.width;   // tiles across
+  const mapH = mapData.height;  // tiles down
+  const renderW = mapW * T * S;
+  const renderH = mapH * T * S;
+  const offsetX = Math.floor((CANVAS_WIDTH - renderW) / 2);
+  const offsetY = Math.floor((CANVAS_HEIGHT - renderH) / 2);
 
-  // Always fill base floor color first (covers any transparent tile pixels)
-  rc.fillStyle = roomDef.floorColor;
-  rc.fillRect(floorLeft, floorTop, floorRight - floorLeft, floorBottom - floorTop);
+  // Set room bounds for heart spawning.
+  // Wall tiles occupy the first 4 rows; floor is the rest.
+  const wallRows = 4;
+  ROOM_BOUNDS = {
+    x: offsetX,
+    y: offsetY,
+    w: renderW,
+    h: renderH,
+    wallHeight: wallRows * T * S,
+  };
 
-  if (roomDef.floorTile) {
-    const ft = roomDef.floorTile;
-    const floorImg = SpriteLoader.get(TILESETS[ft.tileset].src);
-    if (floorImg) {
-      const tw = ft.sw * S;
-      const th = ft.sh * S;
-      for (let y = floorTop; y < floorBottom; y += th) {
-        for (let x = floorLeft; x < floorRight; x += tw) {
-          const drawW = Math.min(tw, floorRight - x);
-          const drawH = Math.min(th, floorBottom - y);
-          const srcW = Math.min(ft.sw, Math.ceil(drawW / S));
-          const srcH = Math.min(ft.sh, Math.ceil(drawH / S));
-          rc.drawImage(floorImg, ft.sx, ft.sy, srcW, srcH, x, y, srcW * S, srcH * S);
-        }
-      }
-    } else {
-      rc.fillStyle = roomDef.floorColor;
-      rc.fillRect(floorLeft, floorTop, floorRight - floorLeft, floorBottom - floorTop);
-    }
-  } else {
-    rc.fillStyle = roomDef.floorColor;
-    rc.fillRect(floorLeft, floorTop, floorRight - floorLeft, floorBottom - floorTop);
-  }
+  // Render every layer in order
+  for (const layer of mapData.layers) {
+    if (!layer.visible) continue;
 
-  // Wall body — solid blue fill
-  rc.fillStyle = roomDef.wallColor;
-  rc.fillRect(roomX, roomY, roomW, wallHeight);
-
-  // Ceiling decoration at top of wall
-  if (roomDef.ceiling) {
-    const c = roomDef.ceiling;
-    const mh = c.height * S; // molding height scaled
-    let cy = roomY;
-    // Top border line
-    rc.fillStyle = c.border;
-    rc.fillRect(roomX, cy, roomW, S);
-    cy += S;
-    // White molding
-    rc.fillStyle = c.molding;
-    rc.fillRect(roomX, cy, roomW, mh);
-    cy += mh;
-    // Bottom border line
-    rc.fillStyle = c.border;
-    rc.fillRect(roomX, cy, roomW, S);
-  }
-
-  // Baseboard at bottom of wall
-  if (roomDef.baseboard) {
-    const bb = roomDef.baseboard;
-    let by = roomY + wallHeight - (bb.colors.length + 1) * S;
-    for (const color of bb.colors) {
-      rc.fillStyle = color;
-      rc.fillRect(roomX, by, roomW, S);
-      by += S;
-    }
-    // Bottom border line
-    rc.fillStyle = bb.border;
-    rc.fillRect(roomX, by, roomW, S);
-  }
-
-  // Room border strips (frame)
-  const borderColor = roomDef.borderColor || roomDef.wallColor;
-  rc.fillStyle = borderColor;
-  rc.fillRect(roomX, roomY, 8, roomH);              // Left
-  rc.fillRect(roomX + roomW - 8, roomY, 8, roomH);  // Right
-  rc.fillRect(roomX, roomY + roomH - 8, roomW, 8);  // Bottom
-
-  // Draw furniture from tilesets
-  for (const item of roomDef.furniture) {
-    const img = SpriteLoader.get(TILESETS[item.tileset].src);
-    if (img) {
-      const s = item.scale || S;
-      rc.drawImage(
-        img,
-        item.sx, item.sy, item.sw, item.sh,
-        item.dx, item.dy, item.sw * s, item.sh * s
-      );
+    if (layer.type === "tilelayer" && layer.data) {
+      renderTileLayer(rc, layer, mapW, offsetX, offsetY);
+    } else if (layer.type === "objectgroup" && layer.objects) {
+      renderObjectLayer(rc, layer, offsetX, offsetY);
     }
   }
 
   return offscreen;
+}
+
+function renderTileLayer(rc, layer, mapW, offsetX, offsetY) {
+  for (let i = 0; i < layer.data.length; i++) {
+    const gid = layer.data[i];
+    if (gid === 0) continue;
+
+    const resolved = resolveGid(gid);
+    if (!resolved) continue;
+
+    const col = i % mapW;
+    const row = Math.floor(i / mapW);
+    const dx = offsetX + col * T * S;
+    const dy = offsetY + row * T * S;
+
+    rc.drawImage(
+      resolved.img,
+      resolved.sx, resolved.sy, T, T,
+      dx, dy, T * S, T * S
+    );
+  }
+}
+
+function renderObjectLayer(rc, layer, offsetX, offsetY) {
+  for (const obj of layer.objects) {
+    if (!obj.visible || !obj.gid) continue;
+
+    const resolved = resolveGid(obj.gid);
+    if (!resolved) continue;
+
+    // Tiled object y is at the BOTTOM of the object
+    const dx = offsetX + obj.x * S;
+    const dy = offsetY + (obj.y - obj.height) * S;
+    const dw = obj.width * S;
+    const dh = obj.height * S;
+
+    rc.drawImage(
+      resolved.img,
+      resolved.sx, resolved.sy, T, T,
+      dx, dy, dw, dh
+    );
+  }
+}
+
+// --- Room Info (title/year overlay) ---
+// Set per room; drawn each frame over the wall area.
+let currentRoomInfo = { year: "", title: "" };
+
+function setRoomInfo(info) {
+  currentRoomInfo = info;
+}
+
+function drawRoomTitle(targetCtx) {
+  if (!currentRoomInfo.title && !currentRoomInfo.year) return;
+
+  const cx = ROOM_BOUNDS.x + ROOM_BOUNDS.w / 2;
+  const wallTop = ROOM_BOUNDS.y;
+  const wallBot = ROOM_BOUNDS.y + ROOM_BOUNDS.wallHeight;
+  const midY = wallTop + (wallBot - wallTop) * 0.38;
+
+  targetCtx.save();
+  targetCtx.textAlign = "center";
+
+  // Year — smaller, above the title
+  if (currentRoomInfo.year) {
+    targetCtx.font = "bold 26px monospace";
+    targetCtx.fillStyle = "rgba(0,0,0,0.35)";
+    //targetCtx.fillText(currentRoomInfo.year, cx + 2, midY - 48 + 2);
+    targetCtx.fillText(currentRoomInfo.year, cx + 2, midY + 418 + 2);
+    targetCtx.fillStyle = "#fff";
+    //targetCtx.fillText(currentRoomInfo.year, cx, midY - 48);
+    targetCtx.fillText(currentRoomInfo.year, cx, midY + 418);
+  }
+
+  // Title — larger
+  if (currentRoomInfo.title) {
+    targetCtx.font = "bold 34px monospace";
+    targetCtx.fillStyle = "rgba(0,0,0,0.35)";
+    //targetCtx.fillText(currentRoomInfo.title, cx + 2, midY - 19 + 2);
+    targetCtx.fillText(currentRoomInfo.title, cx + 2, midY + 449 + 2);
+    targetCtx.fillStyle = "#fff";
+    //targetCtx.fillText(currentRoomInfo.title, cx, midY - 19);
+    targetCtx.fillText(currentRoomInfo.title, cx, midY + 449);
+  }
+
+  targetCtx.restore();
 }
 
 function drawRoomBackground() {

@@ -25,12 +25,11 @@ let score = 0;
 let hearts = [];
 
 function spawnHearts(count) {
-  const room = ROOM_NURSERY;
   const margin = 40;
-  const minX = room.roomX + margin;
-  const maxX = room.roomX + room.roomW - margin;
-  const minY = room.roomY + room.wallHeight + margin;
-  const maxY = room.roomY + room.roomH - margin;
+  const minX = ROOM_BOUNDS.x + margin;
+  const maxX = ROOM_BOUNDS.x + ROOM_BOUNDS.w - margin;
+  const minY = ROOM_BOUNDS.y + ROOM_BOUNDS.wallHeight + margin;
+  const maxY = ROOM_BOUNDS.y + ROOM_BOUNDS.h - margin;
   for (let i = 0; i < count; i++) {
     hearts.push({
       x: Math.random() * (maxX - minX) + minX,
@@ -41,8 +40,6 @@ function spawnHearts(count) {
     });
   }
 }
-
-spawnHearts(8);
 
 // --- Input System ---
 const keysPressed = {
@@ -112,6 +109,7 @@ function drawBackground() {
 
 function render() {
   drawBackground();
+  drawRoomTitle(ctx);
   drawHearts();
   drawPlayer();
   drawScore();
@@ -154,12 +152,15 @@ function gameLoop(currentTime) {
 }
 
 // --- Start ---
-// Preload all sprite sheets + tilesets, then compose room and start
+// Preload sprite sheets + tileset images, load Tiled map, then compose and start
 const allLoads = [
   SpriteLoader.preloadAll(SPRITE_SHEETS),
-  ...Object.values(TILESETS).map((t) => SpriteLoader.load(t.src)),
+  ...MAP_TILESETS.map((t) => SpriteLoader.load(t.src)),
 ];
-Promise.allSettled(allLoads).then(() => {
-  roomBackground = composeRoom(ROOM_NURSERY);
+Promise.allSettled(allLoads).then(async () => {
+  const mapData = await loadMap("assets/maps/nursery.json");
+  roomBackground = composeRoom(mapData);
+  setRoomInfo({ year: "1993", title: "Learn to Walk" });
+  spawnHearts(8);
   requestAnimationFrame(gameLoop);
 });

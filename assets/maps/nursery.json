@@ -115,15 +115,15 @@
  "tilesets":[
         {
          "firstgid":1,
-         "source":"..\/..\/..\/..\/Room_Builder_16x16_2.tsx"
-        }, 
+         "source":"..\/tilesets\/Room_Builder_16x16.tsx"
+        },
         {
          "firstgid":8589,
-         "source":"..\/..\/..\/..\/9_Fishing_16x16.tsx"
-        }, 
+         "source":"..\/tilesets\/9_Fishing_16x16.tsx"
+        },
         {
          "firstgid":9021,
-         "source":"..\/..\/..\/..\/4_Bedroom_16x16.tsx"
+         "source":"..\/tilesets\/4_Bedroom_16x16.tsx"
         }],
  "tilewidth":16,
  "type":"map",
