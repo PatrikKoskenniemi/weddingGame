@@ -254,19 +254,19 @@ function drawLevelComplete(targetCtx, roomInfo) {
   // "Level Complete!" — large
   targetCtx.font = "bold 52px monospace";
   targetCtx.fillStyle = "rgba(0,0,0,0.4)";
-  targetCtx.fillText("Level Complete!", cx + 3, cy - 30 + 3);
+  targetCtx.fillText("Level Complete!", cx + 3, cy - 40 + 3);
   targetCtx.fillStyle = "#ffd700";
-  targetCtx.fillText("Level Complete!", cx, cy - 30);
+  targetCtx.fillText("Level Complete!", cx, cy - 40);
 
-  // Room title
+  // Room title — 20px gap below "Level Complete!"
   targetCtx.font = "bold 28px monospace";
   targetCtx.fillStyle = "#fff";
   targetCtx.fillText(roomInfo.year + " — " + roomInfo.title, cx, cy + 20);
 
-  // "Press any key"
+  // "Press space"
   targetCtx.font = "22px monospace";
   targetCtx.fillStyle = "rgba(255,255,255,0.6)";
-  targetCtx.fillText("Press any key to continue...", cx, cy + 70);
+  targetCtx.fillText("Press space to continue...", cx, cy + 70);
 
   targetCtx.restore();
 }

@@ -13,6 +13,13 @@ const CANVAS_HEIGHT = canvas.height;
 let gameState = "loading"; // "loading" | "playing" | "levelComplete"
 let currentRoomIndex = 0;
 
+// Restore room from URL hash (e.g. #room=1) so refresh stays on same room
+const hashMatch = location.hash.match(/room=(\d+)/);
+if (hashMatch) {
+  const idx = parseInt(hashMatch[1], 10);
+  if (idx >= 0 && idx < ROOMS.length) currentRoomIndex = idx;
+}
+
 // --- Game Objects ---
 const player = {
   x: CANVAS_WIDTH / 2,
@@ -59,8 +66,8 @@ window.addEventListener("keydown", (e) => {
     e.preventDefault();
   }
 
-  // Any key dismisses level complete popup
-  if (gameState === "levelComplete") {
+  // Space dismisses level complete popup
+  if (gameState === "levelComplete" && e.key === " ") {
     advanceToNextRoom();
     e.preventDefault();
   }
@@ -91,6 +98,7 @@ function checkDoorCollision() {
 async function loadRoom(roomIndex) {
   gameState = "loading";
   currentRoomIndex = roomIndex;
+  location.hash = "room=" + roomIndex;
 
   const room = ROOMS[roomIndex];
   const mapData = await loadMap(room.map);
@@ -226,6 +234,6 @@ const allLoads = [
   ...MAP_TILESETS.map((t) => SpriteLoader.load(t.src)),
 ];
 Promise.allSettled(allLoads).then(async () => {
-  await loadRoom(0);
+  await loadRoom(currentRoomIndex);
   requestAnimationFrame(gameLoop);
 });
