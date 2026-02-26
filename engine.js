@@ -9,6 +9,10 @@ ctx.imageSmoothingEnabled = false;
 const CANVAS_WIDTH = canvas.width;
 const CANVAS_HEIGHT = canvas.height;
 
+// --- Game State ---
+let gameState = "loading"; // "loading" | "playing" | "levelComplete"
+let currentRoomIndex = 0;
+
 // --- Game Objects ---
 const player = {
   x: CANVAS_WIDTH / 2,
@@ -54,6 +58,12 @@ window.addEventListener("keydown", (e) => {
     keysPressed[e.key] = true;
     e.preventDefault();
   }
+
+  // Any key dismisses level complete popup
+  if (gameState === "levelComplete") {
+    advanceToNextRoom();
+    e.preventDefault();
+  }
 });
 
 window.addEventListener("keyup", (e) => {
@@ -62,6 +72,55 @@ window.addEventListener("keyup", (e) => {
     e.preventDefault();
   }
 });
+
+// --- Door Detection ---
+function checkDoorCollision() {
+  const room = ROOMS[currentRoomIndex];
+  if (!room || !room.door) return false;
+
+  const door = doorToCanvas(room.door);
+  return (
+    player.x > door.x &&
+    player.x < door.x + door.w &&
+    player.y > door.y &&
+    player.y < door.y + door.h
+  );
+}
+
+// --- Room Loading ---
+async function loadRoom(roomIndex) {
+  gameState = "loading";
+  currentRoomIndex = roomIndex;
+
+  const room = ROOMS[roomIndex];
+  const mapData = await loadMap(room.map);
+  roomBackground = composeRoom(mapData);
+  setRoomInfo({ year: room.year, title: room.title });
+
+  // Place player at spawn point
+  const spawn = spawnToCanvas(room.spawn);
+  player.x = spawn.x;
+  player.y = spawn.y;
+  player._prevX = spawn.x;
+  player._prevY = spawn.y;
+  setSpriteAnimation(player.sprite, "idle_down");
+
+  // Reset hearts for new room
+  hearts = [];
+  spawnHearts(8);
+
+  gameState = "playing";
+}
+
+function advanceToNextRoom() {
+  const nextIndex = currentRoomIndex + 1;
+  if (nextIndex < ROOMS.length) {
+    loadRoom(nextIndex);
+  } else {
+    // Last room — stay on level complete screen
+    gameState = "levelComplete";
+  }
+}
 
 // --- Player Direction Detection ---
 function updatePlayerDirection() {
@@ -113,6 +172,10 @@ function render() {
   drawHearts();
   drawPlayer();
   drawScore();
+
+  if (gameState === "levelComplete") {
+    drawLevelComplete(ctx, ROOMS[currentRoomIndex]);
+  }
 }
 
 // --- Heart Respawn ---
@@ -129,21 +192,26 @@ function gameLoop(currentTime) {
   const deltaTime = currentTime - lastTime;
   lastTime = currentTime;
 
-  // Update logic (calls functions from gameLogic.js)
-  updatePlayerPosition(player, keysPressed);
-  score += checkHeartCollection(player, hearts);
+  if (gameState === "playing") {
+    // Update logic (calls functions from gameLogic.js)
+    updatePlayerPosition(player, keysPressed);
+    score += checkHeartCollection(player, hearts);
 
-  // Detect player facing direction for sprite animation
+    // Check if player reached the door
+    if (checkDoorCollision()) {
+      gameState = "levelComplete";
+    }
+
+    // Respawn hearts when all collected
+    checkRespawn();
+  }
+
+  // Always update visuals (animations run in all states)
   updatePlayerDirection();
-
-  // Update sprite animations
   updateSpriteAnimation(player.sprite, deltaTime);
   for (const heart of hearts) {
     updateSpriteAnimation(heart.sprite, deltaTime);
   }
-
-  // Respawn hearts when all collected
-  checkRespawn();
 
   // Draw everything
   render();
@@ -152,15 +220,12 @@ function gameLoop(currentTime) {
 }
 
 // --- Start ---
-// Preload sprite sheets + tileset images, load Tiled map, then compose and start
+// Preload sprite sheets + tileset images, then load first room and start
 const allLoads = [
   SpriteLoader.preloadAll(SPRITE_SHEETS),
   ...MAP_TILESETS.map((t) => SpriteLoader.load(t.src)),
 ];
 Promise.allSettled(allLoads).then(async () => {
-  const mapData = await loadMap("assets/maps/nursery.json");
-  roomBackground = composeRoom(mapData);
-  setRoomInfo({ year: "1993", title: "Learn to Walk" });
-  spawnHearts(8);
+  await loadRoom(0);
   requestAnimationFrame(gameLoop);
 });

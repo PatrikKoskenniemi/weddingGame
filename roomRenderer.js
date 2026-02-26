@@ -7,6 +7,45 @@
 const T = 16; // tile size in source sheets
 const S = 3;  // render scale (16px source → 48px game)
 
+// --- Room Registry ---
+// Each room defines its map, metadata, door zone, and player spawn.
+const ROOMS = [
+  {
+    id: "nursery",
+    map: "assets/maps/nursery.json",
+    year: "1993",
+    title: "Learn to Walk",
+    door: { col: 15, row: 2, w: 2, h: 3 },
+    spawn: { col: 8, row: 8 },
+  },
+  {
+    id: "single_life",
+    map: "assets/maps/single_life.json",
+    year: "2015",
+    title: "Single Life",
+    door: { col: 15, row: 2, w: 2, h: 3 },
+    spawn: { col: 2, row: 8 },
+  },
+];
+
+// Convert a tile-coordinate rect to canvas-pixel rect
+function doorToCanvas(door) {
+  return {
+    x: ROOM_BOUNDS.x + door.col * T * S,
+    y: ROOM_BOUNDS.y + door.row * T * S,
+    w: door.w * T * S,
+    h: door.h * T * S,
+  };
+}
+
+// Convert tile coords to canvas-pixel position (center of tile)
+function spawnToCanvas(spawn) {
+  return {
+    x: ROOM_BOUNDS.x + (spawn.col + 0.5) * T * S,
+    y: ROOM_BOUNDS.y + (spawn.row + 0.5) * T * S,
+  };
+}
+
 // Tileset definitions matching the Tiled map's tilesets.
 // firstgid + columns come from the .tsx files referenced in nursery.json.
 const MAP_TILESETS = [
@@ -197,4 +236,37 @@ function drawRoomBackground() {
     ctx.fillStyle = "#1a1a2e";
     ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
   }
+}
+
+// --- Level Complete Overlay ---
+
+function drawLevelComplete(targetCtx, roomInfo) {
+  // Semi-transparent dark backdrop
+  targetCtx.fillStyle = "rgba(0, 0, 0, 0.6)";
+  targetCtx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+  const cx = CANVAS_WIDTH / 2;
+  const cy = CANVAS_HEIGHT / 2;
+
+  targetCtx.save();
+  targetCtx.textAlign = "center";
+
+  // "Level Complete!" — large
+  targetCtx.font = "bold 52px monospace";
+  targetCtx.fillStyle = "rgba(0,0,0,0.4)";
+  targetCtx.fillText("Level Complete!", cx + 3, cy - 30 + 3);
+  targetCtx.fillStyle = "#ffd700";
+  targetCtx.fillText("Level Complete!", cx, cy - 30);
+
+  // Room title
+  targetCtx.font = "bold 28px monospace";
+  targetCtx.fillStyle = "#fff";
+  targetCtx.fillText(roomInfo.year + " — " + roomInfo.title, cx, cy + 20);
+
+  // "Press any key"
+  targetCtx.font = "22px monospace";
+  targetCtx.fillStyle = "rgba(255,255,255,0.6)";
+  targetCtx.fillText("Press any key to continue...", cx, cy + 70);
+
+  targetCtx.restore();
 }
