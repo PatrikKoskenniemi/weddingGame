@@ -26,6 +26,14 @@ const ROOMS = [
     door: { col: 15, row: 2, w: 2, h: 3 },
     spawn: { col: 2, row: 8 },
   },
+  {
+    id: "coding_in_the_dark",
+    map: "assets/maps/coding_in_the_dark.json",
+    year: "",
+    title: "Code in the Dark",
+    door: { col: 14, row: 2, w: 2, h: 3 },
+    spawn: { col: 2, row: 5 },
+  },
 ];
 
 // Convert a tile-coordinate rect to canvas-pixel rect
@@ -46,16 +54,11 @@ function spawnToCanvas(spawn) {
   };
 }
 
-// Tileset definitions matching the Tiled map's tilesets.
-// firstgid + columns come from the .tsx files referenced in nursery.json.
-const MAP_TILESETS = [
-  { name: "Room_Builder", firstgid: 1,    columns: 76, src: "assets/tilesets/room_builder.png" },
-  { name: "Fishing",      firstgid: 8589, columns: 16, src: "assets/tilesets/fishing.png" },
-  { name: "Bedroom",      firstgid: 9021, columns: 16, src: "assets/tilesets/bedroom.png" },
-];
-
 // Room bounds — set after map loads, used by engine for heart spawning
 let ROOM_BOUNDS = { x: 0, y: 0, w: 0, h: 0, wallHeight: 0 };
+
+// Per-room tilesets — loaded dynamically from .tsx files at map load time
+let roomTilesets = [];
 
 let roomBackground = null;
 
@@ -69,8 +72,8 @@ const GID_MASK = ~(FLIP_H | FLIP_V | FLIP_D);
 
 // Find which tileset a GID belongs to (search from highest firstgid down)
 function findTileset(gid) {
-  for (let i = MAP_TILESETS.length - 1; i >= 0; i--) {
-    if (gid >= MAP_TILESETS[i].firstgid) return MAP_TILESETS[i];
+  for (let i = roomTilesets.length - 1; i >= 0; i--) {
+    if (gid >= roomTilesets[i].firstgid) return roomTilesets[i];
   }
   return null;
 }
@@ -91,11 +94,67 @@ function resolveGid(gid) {
   return img ? { img, sx: col * T, sy: row * T } : null;
 }
 
+// --- Tileset Loading ---
+
+function resolvePath(base, relative) {
+  const parts = (base + relative).split("/");
+  const result = [];
+  for (const p of parts) {
+    if (p === "..") result.pop();
+    else if (p !== ".") result.push(p);
+  }
+  return result.join("/");
+}
+
+async function loadTilesets(mapData, mapUrl) {
+  const mapBase = mapUrl.substring(0, mapUrl.lastIndexOf("/") + 1);
+  const tilesets = [];
+
+  for (const ts of mapData.tilesets) {
+    if (!ts.source) continue;
+
+    const tsxPath = resolvePath(mapBase, ts.source);
+    const tsxBase = tsxPath.substring(0, tsxPath.lastIndexOf("/") + 1);
+
+    try {
+      const resp = await fetch(tsxPath + "?v=" + Date.now());
+      if (!resp.ok) { console.warn("Missing tileset:", tsxPath); continue; }
+      const xml = await resp.text();
+      const doc = new DOMParser().parseFromString(xml, "text/xml");
+
+      const columns = parseInt(doc.querySelector("tileset").getAttribute("columns") || "0");
+      const imgEl = doc.querySelector("image");
+      if (!imgEl || columns === 0) continue;
+
+      const imgPath = resolvePath(tsxBase, imgEl.getAttribute("source"));
+      await SpriteLoader.load(imgPath);
+
+      const animations = {};
+      for (const tileEl of doc.querySelectorAll("tile")) {
+        const localId = parseInt(tileEl.getAttribute("id"));
+        const frames = [...tileEl.querySelectorAll("animation > frame")].map(f => ({
+          tileid: parseInt(f.getAttribute("tileid")),
+          duration: parseInt(f.getAttribute("duration")),
+        }));
+        if (frames.length > 0) animations[localId] = frames;
+      }
+
+      tilesets.push({ firstgid: ts.firstgid, columns, src: imgPath, animations });
+    } catch (e) {
+      console.warn("Failed to load tileset:", tsxPath, e);
+    }
+  }
+
+  return tilesets;
+}
+
 // --- Map Loading ---
 
 async function loadMap(url) {
   const resp = await fetch(url + "?v=" + Date.now());
-  return resp.json();
+  const mapData = await resp.json();
+  roomTilesets = await loadTilesets(mapData, url);
+  return mapData;
 }
 
 // --- Room Composition ---
@@ -148,19 +207,15 @@ function renderTileLayer(rc, layer, mapW, offsetX, offsetY) {
     const gid = layer.data[i];
     if (gid === 0) continue;
 
-    const resolved = resolveGid(gid);
-    if (!resolved) continue;
-
     const col = i % mapW;
     const row = Math.floor(i / mapW);
     const dx = offsetX + col * T * S;
     const dy = offsetY + row * T * S;
 
-    rc.drawImage(
-      resolved.img,
-      resolved.sx, resolved.sy, T, T,
-      dx, dy, T * S, T * S
-    );
+    const resolved = resolveGid(gid);
+    if (!resolved) continue;
+
+    rc.drawImage(resolved.img, resolved.sx, resolved.sy, T, T, dx, dy, T * S, T * S);
   }
 }
 
@@ -168,20 +223,16 @@ function renderObjectLayer(rc, layer, offsetX, offsetY) {
   for (const obj of layer.objects) {
     if (!obj.visible || !obj.gid) continue;
 
-    const resolved = resolveGid(obj.gid);
-    if (!resolved) continue;
-
     // Tiled object y is at the BOTTOM of the object
     const dx = offsetX + obj.x * S;
     const dy = offsetY + (obj.y - obj.height) * S;
     const dw = obj.width * S;
     const dh = obj.height * S;
 
-    rc.drawImage(
-      resolved.img,
-      resolved.sx, resolved.sy, T, T,
-      dx, dy, dw, dh
-    );
+    const resolved = resolveGid(obj.gid);
+    if (!resolved) continue;
+
+    rc.drawImage(resolved.img, resolved.sx, resolved.sy, T, T, dx, dy, dw, dh);
   }
 }
 

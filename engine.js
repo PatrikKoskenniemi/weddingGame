@@ -231,7 +231,6 @@ function gameLoop(currentTime) {
 // Preload sprite sheets + tileset images, then load first room and start
 const allLoads = [
   SpriteLoader.preloadAll(SPRITE_SHEETS),
-  ...MAP_TILESETS.map((t) => SpriteLoader.load(t.src)),
 ];
 Promise.allSettled(allLoads).then(async () => {
   await loadRoom(currentRoomIndex);
