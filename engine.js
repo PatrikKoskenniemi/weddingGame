@@ -102,7 +102,7 @@ async function loadRoom(roomIndex) {
 
   const room = ROOMS[roomIndex];
   const mapData = await loadMap(room.map);
-  roomBackground = composeRoom(mapData);
+  composeRoom(mapData);
   setRoomInfo({ year: room.year, title: room.title });
 
   // Place player at spawn point
@@ -176,6 +176,8 @@ function drawBackground() {
 
 function render() {
   drawBackground();
+  drawAnimatedTiles(ctx);
+  drawRoomForeground();
   drawRoomTitle(ctx);
   drawHearts();
   drawPlayer();
@@ -215,6 +217,7 @@ function gameLoop(currentTime) {
   }
 
   // Always update visuals (animations run in all states)
+  updateAnimatedTiles(deltaTime);
   updatePlayerDirection();
   updateSpriteAnimation(player.sprite, deltaTime);
   for (const heart of hearts) {

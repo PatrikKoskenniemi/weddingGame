@@ -60,7 +60,14 @@ let ROOM_BOUNDS = { x: 0, y: 0, w: 0, h: 0, wallHeight: 0 };
 // Per-room tilesets — loaded dynamically from .tsx files at map load time
 let roomTilesets = [];
 
-let roomBackground = null;
+// Animated tiles collected at room load — overdrawn each frame between the two background layers
+let roomAnimatedTiles = [];
+
+// Static background split at the animated layer so animated tiles render in correct z-order:
+//   roomBackgroundBelow: dark bg + all layers up to and including the last animated layer
+//   roomBackgroundAbove: transparent + all layers above the last animated layer
+let roomBackgroundBelow = null;
+let roomBackgroundAbove = null;
 
 // --- GID Resolution ---
 
@@ -157,52 +164,97 @@ async function loadMap(url) {
   return mapData;
 }
 
+// --- Animated Tile Helpers ---
+
+function isAnimatedGid(gid) {
+  const rawGid = gid & GID_MASK;
+  if (rawGid === 0) return false;
+  const ts = findTileset(rawGid);
+  return !!(ts && ts.animations && ts.animations[rawGid - ts.firstgid]);
+}
+
+function collectAnimatedTile(gid, dx, dy, dw, dh) {
+  const rawGid = gid & GID_MASK;
+  const ts = findTileset(rawGid);
+  if (!ts) return;
+  const localId = rawGid - ts.firstgid;
+  const img = SpriteLoader.get(ts.src);
+  if (!img) return;
+  roomAnimatedTiles.push({
+    dx, dy, dw, dh,
+    frames: ts.animations[localId].map(f => ({
+      img,
+      sx: (f.tileid % ts.columns) * T,
+      sy: Math.floor(f.tileid / ts.columns) * T,
+      duration: f.duration,
+    })),
+    elapsed: 0,
+    frameIdx: 0,
+  });
+}
+
 // --- Room Composition ---
 
-function composeRoom(mapData) {
-  const offscreen = document.createElement("canvas");
-  offscreen.width = CANVAS_WIDTH;
-  offscreen.height = CANVAS_HEIGHT;
-  const rc = offscreen.getContext("2d");
+function makeCanvas() {
+  const c = document.createElement("canvas");
+  c.width = CANVAS_WIDTH;
+  c.height = CANVAS_HEIGHT;
+  const rc = c.getContext("2d");
   rc.imageSmoothingEnabled = false;
+  return { canvas: c, rc };
+}
 
-  // Dark surround
-  rc.fillStyle = "#1a1a2e";
-  rc.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+function composeRoom(mapData) {
+  roomAnimatedTiles = [];
 
-  const mapW = mapData.width;   // tiles across
-  const mapH = mapData.height;  // tiles down
+  const mapW = mapData.width;
+  const mapH = mapData.height;
   const renderW = mapW * T * S;
   const renderH = mapH * T * S;
   const offsetX = Math.floor((CANVAS_WIDTH - renderW) / 2);
   const offsetY = Math.floor((CANVAS_HEIGHT - renderH) / 2);
 
-  // Set room bounds for heart spawning.
-  // Wall tiles occupy the first 4 rows; floor is the rest.
   const wallRows = 4;
-  ROOM_BOUNDS = {
-    x: offsetX,
-    y: offsetY,
-    w: renderW,
-    h: renderH,
-    wallHeight: wallRows * T * S,
-  };
+  ROOM_BOUNDS = { x: offsetX, y: offsetY, w: renderW, h: renderH, wallHeight: wallRows * T * S };
 
-  // Render every layer in order
-  for (const layer of mapData.layers) {
+  // Find the last layer index that contains animated tiles
+  let lastAnimLayerIdx = -1;
+  for (let li = 0; li < mapData.layers.length; li++) {
+    const layer = mapData.layers[li];
+    if (!layer.visible) continue;
+    const hasAnim =
+      (layer.type === "tilelayer" && layer.data?.some(gid => gid !== 0 && isAnimatedGid(gid))) ||
+      (layer.type === "objectgroup" && layer.objects?.some(obj => obj.gid && isAnimatedGid(obj.gid)));
+    if (hasAnim) lastAnimLayerIdx = li;
+  }
+
+  // Below: dark bg + all layers 0..lastAnimLayerIdx (animated tiles also drawn here at frame 0)
+  const { canvas: below, rc: rcBelow } = makeCanvas();
+  rcBelow.fillStyle = "#1a1a2e";
+  rcBelow.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+  // Above: transparent + layers lastAnimLayerIdx+1..end
+  const { canvas: above, rc: rcAbove } = makeCanvas();
+
+  for (let li = 0; li < mapData.layers.length; li++) {
+    const layer = mapData.layers[li];
     if (!layer.visible) continue;
 
+    const rc = li <= lastAnimLayerIdx ? rcBelow : rcAbove;
+    const collectAnims = li <= lastAnimLayerIdx;
+
     if (layer.type === "tilelayer" && layer.data) {
-      renderTileLayer(rc, layer, mapW, offsetX, offsetY);
+      renderTileLayer(rc, layer, mapW, offsetX, offsetY, collectAnims);
     } else if (layer.type === "objectgroup" && layer.objects) {
-      renderObjectLayer(rc, layer, offsetX, offsetY);
+      renderObjectLayer(rc, layer, offsetX, offsetY, collectAnims);
     }
   }
 
-  return offscreen;
+  roomBackgroundBelow = below;
+  roomBackgroundAbove = above;
 }
 
-function renderTileLayer(rc, layer, mapW, offsetX, offsetY) {
+function renderTileLayer(rc, layer, mapW, offsetX, offsetY, collectAnims) {
   for (let i = 0; i < layer.data.length; i++) {
     const gid = layer.data[i];
     if (gid === 0) continue;
@@ -212,6 +264,8 @@ function renderTileLayer(rc, layer, mapW, offsetX, offsetY) {
     const dx = offsetX + col * T * S;
     const dy = offsetY + row * T * S;
 
+    if (collectAnims && isAnimatedGid(gid)) collectAnimatedTile(gid, dx, dy, T * S, T * S);
+
     const resolved = resolveGid(gid);
     if (!resolved) continue;
 
@@ -219,7 +273,7 @@ function renderTileLayer(rc, layer, mapW, offsetX, offsetY) {
   }
 }
 
-function renderObjectLayer(rc, layer, offsetX, offsetY) {
+function renderObjectLayer(rc, layer, offsetX, offsetY, collectAnims) {
   for (const obj of layer.objects) {
     if (!obj.visible || !obj.gid) continue;
 
@@ -229,10 +283,31 @@ function renderObjectLayer(rc, layer, offsetX, offsetY) {
     const dw = obj.width * S;
     const dh = obj.height * S;
 
+    if (collectAnims && isAnimatedGid(obj.gid)) collectAnimatedTile(obj.gid, dx, dy, dw, dh);
+
     const resolved = resolveGid(obj.gid);
     if (!resolved) continue;
 
     rc.drawImage(resolved.img, resolved.sx, resolved.sy, T, T, dx, dy, dw, dh);
+  }
+}
+
+// --- Animated Tile Update / Draw ---
+
+function updateAnimatedTiles(deltaTime) {
+  for (const anim of roomAnimatedTiles) {
+    anim.elapsed += deltaTime;
+    while (anim.elapsed >= anim.frames[anim.frameIdx].duration) {
+      anim.elapsed -= anim.frames[anim.frameIdx].duration;
+      anim.frameIdx = (anim.frameIdx + 1) % anim.frames.length;
+    }
+  }
+}
+
+function drawAnimatedTiles(targetCtx) {
+  for (const anim of roomAnimatedTiles) {
+    const f = anim.frames[anim.frameIdx];
+    targetCtx.drawImage(f.img, f.sx, f.sy, T, T, anim.dx, anim.dy, anim.dw, anim.dh);
   }
 }
 
@@ -281,11 +356,17 @@ function drawRoomTitle(targetCtx) {
 }
 
 function drawRoomBackground() {
-  if (roomBackground) {
-    ctx.drawImage(roomBackground, 0, 0);
+  if (roomBackgroundBelow) {
+    ctx.drawImage(roomBackgroundBelow, 0, 0);
   } else {
     ctx.fillStyle = "#1a1a2e";
     ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+  }
+}
+
+function drawRoomForeground() {
+  if (roomBackgroundAbove) {
+    ctx.drawImage(roomBackgroundAbove, 0, 0);
   }
 }
 
