@@ -19,6 +19,7 @@ Pokemon-inspired aesthetic throughout:
 - Tile-based environments with clear, chunky sprites
 - Dialog boxes / text boxes for room introductions (Pokemon-style bordered text box at bottom of screen)
 - Room transitions similar to Pokemon area transitions
+- Story intro text between rooms to narrate the couple's journey
 - Characters as small sprite-like figures
 
 ## Difficulty Approach
@@ -49,7 +50,7 @@ Each room should have a unique player character that fits the life stage. The ch
 | 1 – Baby Steps | Baby | Crawling/toddler sprite |
 | 2 – Single Life | TBD | Young adult, party vibe |
 | 3 – First Date | TBD | Dressed up / romantic |
-| 4 – Coding in the Dark | Programmer / Emo | Dark clothes, hoodie, emo-like feel |
+| 4 – Code in the Dark | Programmer / Emo | Dark clothes, hoodie, emo-like feel |
 | 5 – Moving In Together | TBD | Casual |
 | 6 – Baby Born | TBD | Parent |
 | 7 – Holiday Trip | TBD | Tourist |
@@ -57,6 +58,18 @@ Each room should have a unique player character that fits the life stage. The ch
 | 9 – Wedding Day | Bride | Wedding dress sprite |
 
 📋 **TODO:** Find or create specific character sprites for each room. Current asset pack (Modern Interiors Free v2.2) has: Adam, Alex, Amelia, Bob with walk/run/idle/sit/phone animations (16x32 frames).
+
+---
+
+## Story Intros
+
+Between each room, a story text is shown to narrate the couple's journey and introduce the next room. These are displayed as text overlays during the transition between rooms.
+
+| Before Room | Story Intro |
+|-------------|-------------|
+| Room 4 – Code in the Dark | "Gustav och Elina växer upp, dom idrottar, dom studera och träffar varandra mene besultar sig för att gå vidare separat. Ödet verkar dock ha andra planer..." |
+
+*(Add more story intros as rooms are designed)*
 
 ---
 
@@ -106,16 +119,16 @@ Possible ideas to explore:
 
 ---
 
-### Room 4 – Coding in the Dark
-**Life stage:** Gustav and Elina had broken up, then ran into each other at a coding challenge event called "Coding in the Dark" (or similar). This was a turning point that brought them back together.
+### Room 4 – Code in the Dark
+**Life stage:** Gustav and Elina had broken up, then ran into each other at a coding challenge event called "Code in the Dark". This was a turning point that brought them back together.
+**Reference:** http://codeinthedark.com/
+**Story intro:** "Gustav och Elina växer upp, dom idrottar, dom studera och träffar varandra mene besultar sig för att gå vidare separat. Ödet verkar dock ha andra planer..."
 **Objective:** TBD — should tie into the coding challenge theme
 **Mechanic:** TBD
 **Function:** TBD
 **Visuals:** Dark/dim screen, code-themed, terminal green text, dramatic reveal
 **Difficulty:** TBD
 **Status:** ⚠️ NEEDS: research + design
-
-📋 **TODO:** Research what "Coding in the Dark" actually was — what kind of event, what did participants do? This will inform the mechanic.
 
 Possible ideas:
 - Screen is mostly blacked out, player codes "blind" (limited visibility radius)
@@ -202,7 +215,7 @@ Possible ideas:
 | 1 | Baby Steps | Baby | `updatePlayerPosition` | ✅ |
 | 2 | Single Life | Young adult | `checkObstacleCollision` | ✅ |
 | 3 | First Date | Meeting | TBD | ⚠️ |
-| 4 | Coding in the Dark | Reunion | TBD | ⚠️ |
+| 4 | Code in the Dark | Reunion | TBD | ⚠️ |
 | 5 | Moving In Together | First apartment | `checkPlacement` | ✅ |
 | 6 | Baby Born | Parenthood | `updateFallingItems` + `checkCatch` | ✅ |
 | 7 | Holiday Trip | Travel | `updateScroll` | ✅ |
@@ -214,7 +227,7 @@ Possible ideas:
 ## Open Questions
 
 - **Room 3 (First Date):** What should the coding task be?
-- **Room 4 (Coding in the Dark):** 📋 Research what the event actually was. Design mechanic around it.
+- **Room 4 (Code in the Dark):** 📋 Research what the event actually was. Design mechanic around it.
 - **Room 8 (Proposal):** What makes this fun to code?
 - **Room count:** 9 rooms at ~3-5 min each = 30-45 min on stage. Will need to trim.
 - **Score:** Carry across rooms or reset?
