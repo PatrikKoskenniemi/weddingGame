@@ -11,8 +11,8 @@ const S = 4;  // render scale (16px source → 48px game)
 // Each room defines its map, metadata, door zone, and player spawn.
 const ROOMS = [
   {
-    id: "nursery",
-    map: "assets/maps/nursery.json",
+    id: "learn_to_walk",
+    map: "assets/maps/learn_to_walk.json",
     year: "1993",
     title: "Learn to Walk",
     door: { col: 15, row: 2, w: 2, h: 3 },
@@ -296,7 +296,10 @@ function renderTileLayer(rc, layer, mapW, offsetX, offsetY, collectAnims) {
     const dx = offsetX + col * T * S;
     const dy = offsetY + row * T * S;
 
-    if (collectAnims && isAnimatedGid(gid)) collectAnimatedTile(gid, dx, dy, T * S, T * S);
+    if (collectAnims && isAnimatedGid(gid)) {
+      collectAnimatedTile(gid, dx, dy, T * S, T * S);
+      continue;
+    }
 
     const resolved = resolveGid(gid);
     if (!resolved) continue;
@@ -315,7 +318,10 @@ function renderObjectLayer(rc, layer, offsetX, offsetY, collectAnims) {
     const dw = obj.width * S;
     const dh = obj.height * S;
 
-    if (collectAnims && isAnimatedGid(obj.gid)) collectAnimatedTile(obj.gid, dx, dy, dw, dh);
+    if (collectAnims && isAnimatedGid(obj.gid)) {
+      collectAnimatedTile(obj.gid, dx, dy, dw, dh);
+      continue;
+    }
 
     const resolved = resolveGid(obj.gid);
     if (!resolved) continue;
