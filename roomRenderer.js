@@ -220,15 +220,17 @@ function composeRoom(mapData) {
   const wallRows = 4;
   ROOM_BOUNDS = { x: offsetX, y: offsetY, w: renderW, h: renderH, wallHeight: wallRows * T * S };
 
-  // Find the last layer index that contains animated tiles
-  let lastAnimLayerIdx = -1;
+  // Find the last layer index that contains animated tiles.
+  // Default to last layer so all layers go to below when there are no animated tiles.
+  let lastAnimLayerIdx = mapData.layers.length - 1;
+  let hasAnyAnim = false;
   for (let li = 0; li < mapData.layers.length; li++) {
     const layer = mapData.layers[li];
     if (!layer.visible) continue;
     const hasAnim =
       (layer.type === "tilelayer" && layer.data?.some(gid => gid !== 0 && isAnimatedGid(gid))) ||
       (layer.type === "objectgroup" && layer.objects?.some(obj => obj.gid && isAnimatedGid(obj.gid)));
-    if (hasAnim) lastAnimLayerIdx = li;
+    if (hasAnim) { lastAnimLayerIdx = li; hasAnyAnim = true; }
   }
 
   // Below: dark bg + all layers 0..lastAnimLayerIdx (animated tiles also drawn here at frame 0)
@@ -254,7 +256,7 @@ function composeRoom(mapData) {
   }
 
   roomBackgroundBelow = below;
-  roomBackgroundAbove = above;
+  roomBackgroundAbove = hasAnyAnim ? above : null;
 }
 
 function renderTileLayer(rc, layer, mapW, offsetX, offsetY, collectAnims) {
