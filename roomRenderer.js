@@ -17,6 +17,7 @@ const ROOMS = [
     title: "Learn to Walk",
     door: { col: 15, row: 2, w: 2, h: 3 },
     spawn: { col: 8, row: 8 },
+    hearts: false,
   },
   {
     id: "single_life",
@@ -25,6 +26,7 @@ const ROOMS = [
     title: "Single Life",
     door: { col: 15, row: 2, w: 2, h: 3 },
     spawn: { col: 2, row: 8 },
+    hearts: false,
   },
   {
     id: "coding_in_the_dark",
@@ -33,6 +35,7 @@ const ROOMS = [
     title: "Code in the Dark",
     door: { col: 14, row: 2, w: 2, h: 3 },
     spawn: { col: 2, row: 5 },
+    hearts: true,
   },
 ];
 

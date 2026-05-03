@@ -115,7 +115,7 @@ async function loadRoom(roomIndex) {
 
   // Reset hearts for new room
   hearts = [];
-  spawnHearts(8);
+  if (room.hearts) spawnHearts(8);
 
   gameState = "playing";
 }
@@ -190,7 +190,7 @@ function render() {
 
 // --- Heart Respawn ---
 function checkRespawn() {
-  if (hearts.length === 0) {
+  if (hearts.length === 0 && ROOMS[currentRoomIndex].hearts) {
     spawnHearts(8);
   }
 }
