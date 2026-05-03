@@ -1,7 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.10" tiledversion="1.11.2" name="Hairstyle_04_03_red" tilewidth="16" tileheight="16" tilecount="2296" columns="56">
- <image source="../moderninteriors-win/2_Characters/Character_Generator/Hairstyles/16x16/Hairstyle_04_03.png" trans="ff00ff" width="896" height="656"/>
- <tile id="448">
+<tileset version="1.10" tiledversion="1.12.1" name="Hairstyle_06_02" tilewidth="16" tileheight="16" tilecount="2296" columns="56">
+ <image source="../moderninteriors-win/2_Characters/Character_Generator/Hairstyles/16x16/Hairstyle_06_02.png" trans="ff00ff" width="896" height="656"/>
+ <tile id="130">
+  <animation>
+   <frame tileid="130" duration="100"/>
+   <frame tileid="131" duration="100"/>
+   <frame tileid="132" duration="100"/>
+   <frame tileid="133" duration="100"/>
+   <frame tileid="134" duration="100"/>
+   <frame tileid="135" duration="100"/>
+  </animation>
+ </tile>
+ <tile id="186">
+  <animation>
+   <frame tileid="186" duration="100"/>
+   <frame tileid="187" duration="100"/>
+   <frame tileid="188" duration="100"/>
+   <frame tileid="189" duration="100"/>
+   <frame tileid="190" duration="100"/>
+   <frame tileid="191" duration="100"/>
+  </animation>
+ </tile>
+ <tile id="449">
   <animation>
    <frame tileid="448" duration="100"/>
    <frame tileid="449" duration="100"/>
@@ -9,7 +29,6 @@
    <frame tileid="451" duration="100"/>
    <frame tileid="452" duration="100"/>
    <frame tileid="453" duration="100"/>
-   <frame tileid="454" duration="100"/>
   </animation>
  </tile>
  <tile id="454">
@@ -22,7 +41,7 @@
    <frame tileid="459" duration="100"/>
   </animation>
  </tile>
- <tile id="504">
+ <tile id="505">
   <animation>
    <frame tileid="504" duration="100"/>
    <frame tileid="505" duration="100"/>

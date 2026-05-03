@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.10" tiledversion="1.11.2" name="Hairstyle_04_03_red" tilewidth="16" tileheight="16" tilecount="2296" columns="56">
- <image source="../moderninteriors-win/2_Characters/Character_Generator/Hairstyles/16x16/Hairstyle_04_03.png" trans="ff00ff" width="896" height="656"/>
+<tileset version="1.10" tiledversion="1.11.2" name="Hairstyle_17_07" tilewidth="16" tileheight="16" tilecount="2296" columns="56">
+ <image source="../moderninteriors-win/2_Characters/Character_Generator/Hairstyles/16x16/Hairstyle_17_07.png" trans="ff00ff" width="896" height="656"/>
  <tile id="448">
   <animation>
    <frame tileid="448" duration="100"/>
@@ -9,7 +9,6 @@
    <frame tileid="451" duration="100"/>
    <frame tileid="452" duration="100"/>
    <frame tileid="453" duration="100"/>
-   <frame tileid="454" duration="100"/>
   </animation>
  </tile>
  <tile id="454">
