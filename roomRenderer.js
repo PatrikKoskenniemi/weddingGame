@@ -16,7 +16,7 @@ const ROOMS = [
     year: "1993",
     title: "Learn to Walk",
     door: { col: 15, row: 2, w: 2, h: 3 },
-    spawn: { col: 8, row: 8 },
+    spawn: { col: 6.3, row: 8 },
     hearts: false,
   },
   {
