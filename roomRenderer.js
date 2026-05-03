@@ -5,7 +5,7 @@
 // ============================================================
 
 const T = 16; // tile size in source sheets
-const S = 3;  // render scale (16px source → 48px game)
+const S = 4;  // render scale (16px source → 48px game)
 
 // --- Room Registry ---
 // Each room defines its map, metadata, door zone, and player spawn.
@@ -36,6 +36,7 @@ const ROOMS = [
     door: { col: 14, row: 2, w: 2, h: 3 },
     spawn: { col: 2, row: 5 },
     hearts: true,
+    showTitle: false,
   },
 ];
 
@@ -97,6 +98,14 @@ function resolveGid(gid) {
   if (!ts) return null;
 
   const localId = rawGid - ts.firstgid;
+
+  if (ts.columns === 0) {
+    const tile = ts.tiles && ts.tiles[localId];
+    if (!tile) return null;
+    const img = SpriteLoader.get(tile.src);
+    return img ? { img, sx: 0, sy: 0, w: tile.w, h: tile.h } : null;
+  }
+
   const col = localId % ts.columns;
   const row = Math.floor(localId / ts.columns);
   const img = SpriteLoader.get(ts.src);
@@ -132,19 +141,37 @@ async function loadTilesets(mapData, mapUrl) {
       const xml = await resp.text();
       const doc = new DOMParser().parseFromString(xml, "text/xml");
 
-      const columns = parseInt(doc.querySelector("tileset").getAttribute("columns") || "0");
+      const columns = Number.parseInt(doc.querySelector("tileset").getAttribute("columns") || "0");
+
+      if (columns === 0) {
+        // Collection tileset — each tile has its own image element
+        const tiles = {};
+        for (const tileEl of doc.querySelectorAll("tile")) {
+          const localId = Number.parseInt(tileEl.getAttribute("id"));
+          const tileImgEl = tileEl.querySelector("image");
+          if (!tileImgEl) continue;
+          const src = resolvePath(tsxBase, tileImgEl.getAttribute("source"));
+          const w = Number.parseInt(tileImgEl.getAttribute("width") || "0");
+          const h = Number.parseInt(tileImgEl.getAttribute("height") || "0");
+          await SpriteLoader.load(src);
+          tiles[localId] = { src, w, h };
+        }
+        tilesets.push({ firstgid: ts.firstgid, columns: 0, tiles });
+        continue;
+      }
+
       const imgEl = doc.querySelector("image");
-      if (!imgEl || columns === 0) continue;
+      if (!imgEl) continue;
 
       const imgPath = resolvePath(tsxBase, imgEl.getAttribute("source"));
       await SpriteLoader.load(imgPath);
 
       const animations = {};
       for (const tileEl of doc.querySelectorAll("tile")) {
-        const localId = parseInt(tileEl.getAttribute("id"));
+        const localId = Number.parseInt(tileEl.getAttribute("id"));
         const frames = [...tileEl.querySelectorAll("animation > frame")].map(f => ({
-          tileid: parseInt(f.getAttribute("tileid")),
-          duration: parseInt(f.getAttribute("duration")),
+          tileid: Number.parseInt(f.getAttribute("tileid")),
+          duration: Number.parseInt(f.getAttribute("duration")),
         }));
         if (frames.length > 0) animations[localId] = frames;
       }
@@ -293,7 +320,9 @@ function renderObjectLayer(rc, layer, offsetX, offsetY, collectAnims) {
     const resolved = resolveGid(obj.gid);
     if (!resolved) continue;
 
-    rc.drawImage(resolved.img, resolved.sx, resolved.sy, T, T, dx, dy, dw, dh);
+    const sw = resolved.w || T;
+    const sh = resolved.h || T;
+    rc.drawImage(resolved.img, resolved.sx, resolved.sy, sw, sh, dx, dy, dw, dh);
   }
 }
 
@@ -327,34 +356,28 @@ function setRoomInfo(info) {
 function drawRoomTitle(targetCtx) {
   if (!currentRoomInfo.title && !currentRoomInfo.year) return;
 
-  const cx = ROOM_BOUNDS.x + ROOM_BOUNDS.w / 2;
-  const wallTop = ROOM_BOUNDS.y;
-  const wallBot = ROOM_BOUNDS.y + ROOM_BOUNDS.wallHeight;
-  const midY = wallTop + (wallBot - wallTop) * 0.38;
+  const cx = CANVAS_WIDTH / 2;
+  const bottom = CANVAS_HEIGHT - 44;
 
   targetCtx.save();
   targetCtx.textAlign = "center";
+
+  // Title — larger, near bottom
+  if (currentRoomInfo.title) {
+    targetCtx.font = "bold 34px monospace";
+    targetCtx.fillStyle = "rgba(0,0,0,0.35)";
+    targetCtx.fillText(currentRoomInfo.title, cx + 2, bottom + 2);
+    targetCtx.fillStyle = "#fff";
+    targetCtx.fillText(currentRoomInfo.title, cx, bottom);
+  }
 
   // Year — smaller, above the title
   if (currentRoomInfo.year) {
     targetCtx.font = "bold 26px monospace";
     targetCtx.fillStyle = "rgba(0,0,0,0.35)";
-    //targetCtx.fillText(currentRoomInfo.year, cx + 2, midY - 48 + 2);
-    targetCtx.fillText(currentRoomInfo.year, cx + 2, midY + 418 + 2);
+    targetCtx.fillText(currentRoomInfo.year, cx + 2, bottom - 38 + 2);
     targetCtx.fillStyle = "#fff";
-    //targetCtx.fillText(currentRoomInfo.year, cx, midY - 48);
-    targetCtx.fillText(currentRoomInfo.year, cx, midY + 418);
-  }
-
-  // Title — larger
-  if (currentRoomInfo.title) {
-    targetCtx.font = "bold 34px monospace";
-    targetCtx.fillStyle = "rgba(0,0,0,0.35)";
-    //targetCtx.fillText(currentRoomInfo.title, cx + 2, midY - 19 + 2);
-    targetCtx.fillText(currentRoomInfo.title, cx + 2, midY + 449 + 2);
-    targetCtx.fillStyle = "#fff";
-    //targetCtx.fillText(currentRoomInfo.title, cx, midY - 19);
-    targetCtx.fillText(currentRoomInfo.title, cx, midY + 449);
+    targetCtx.fillText(currentRoomInfo.year, cx, bottom - 38);
   }
 
   targetCtx.restore();
@@ -373,6 +396,64 @@ function drawRoomForeground() {
   if (roomBackgroundAbove) {
     ctx.drawImage(roomBackgroundAbove, 0, 0);
   }
+}
+
+// --- Spotlight Overlay ---
+
+function heartPath(ctx, cx, cy, r) {
+  // Normalized in a 20×20 unit box (tip at bottom, bumps at top), scaled by r/10
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.scale(r / 10, r / 10);
+  ctx.beginPath();
+  ctx.moveTo(0, 10);                                   // bottom tip
+  ctx.bezierCurveTo(-2, 7.5, -10,  5,  -10, -1);      // lower-left side
+  ctx.bezierCurveTo(-10, -7,  -5, -10,    0, -5);      // left bump to cleft
+  ctx.bezierCurveTo(  5, -10,  10,  -7,  10, -1);      // cleft to right bump
+  ctx.bezierCurveTo( 10,  5,    2,  7.5,   0, 10);     // lower-right side
+  ctx.closePath();
+  ctx.restore();
+}
+
+function drawSpotlightOverlay(targetCtx) {
+  const offscreen = document.createElement("canvas");
+  offscreen.width = CANVAS_WIDTH;
+  offscreen.height = CANVAS_HEIGHT;
+  const oc = offscreen.getContext("2d");
+
+  oc.fillStyle = "rgba(0, 0, 0, 0.60)";
+  oc.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+  oc.globalCompositeOperation = "destination-out";
+
+  // Clear the north wall so wall images are fully visible
+  oc.fillStyle = "rgba(255,255,255,1)";
+  oc.fillRect(6.13 * T * S, 6, 495, 166);
+
+  const spots = [
+    { col: 8, row: 5.5 },
+  ];
+
+  const r = 185;
+  for (const spot of spots) {
+    const cx = ROOM_BOUNDS.x + spot.col * T * S;
+    const cy = ROOM_BOUNDS.y + spot.row * T * S;
+
+    oc.save();
+    heartPath(oc, cx, cy, r);
+    oc.clip();
+
+    const grad = oc.createRadialGradient(cx, cy, 0, cx, cy, r * 1.95);
+    grad.addColorStop(0,   "rgba(255,255,255,1)");
+    grad.addColorStop(0.2, "rgba(255,255,255,0.8)");
+    grad.addColorStop(1,   "rgba(255,255,255,0)");
+    oc.fillStyle = grad;
+    oc.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+    oc.restore();
+  }
+
+  targetCtx.drawImage(offscreen, 0, 0);
 }
 
 // --- Level Complete Overlay ---

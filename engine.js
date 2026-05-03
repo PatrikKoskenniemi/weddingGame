@@ -178,9 +178,12 @@ function render() {
   drawBackground();
   drawAnimatedTiles(ctx);
   drawRoomForeground();
-  drawRoomTitle(ctx);
+  if (ROOMS[currentRoomIndex].showTitle !== false) drawRoomTitle(ctx);
   drawHearts();
   drawPlayer();
+  if (ROOMS[currentRoomIndex].id === "coding_in_the_dark") {
+    drawSpotlightOverlay(ctx);
+  }
   drawScore();
 
   if (gameState === "levelComplete") {
