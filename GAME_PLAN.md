@@ -2,12 +2,14 @@
 
 ## Concept
 
-The game is a journey through the couple's life, told in rooms. Each room represents a life stage, and the couple must live-code the gameplay mechanic for that stage on stage. The audience watches on a big screen.
+The player is **Annie** — Gustav and Elina's young daughter. She accidentally walks through a time machine in her nursery and lands in her parents' past. Her mission: travel through the key moments of their lives and make sure they actually end up together. If she fails, she won't exist. No pressure.
+
+Gustav and Elina live-code the gameplay logic for each room on stage while the audience watches on a big screen. Annie is always a small child sprite throughout the entire game, regardless of which year or setting she lands in.
 
 Each room has:
-- A **theme** (life stage)
+- A **theme** (a moment in Gustav and Elina's story)
 - A **visual style** (colors, objects)
-- A **gameplay objective** tied to the theme
+- A **gameplay objective** Annie must complete to move the story forward
 - A **function to implement** (what the couple codes live)
 
 Rooms progress from simple mechanics to more complex ones, building on previous code.
@@ -35,39 +37,30 @@ Options per room:
 
 Real people and inside jokes from the couple's life should appear as characters, obstacles, or items throughout the game. This makes it personal and hilarious for the audience.
 
-| Name | Context | How to use (TBD) |
-|------|---------|-------------------|
+| Name | Context | How to use |
+|------|---------|------------|
 | TjockSteffe | TBD | TBD |
+| Theo Berndt | Friend — known as "The Berndt" in the 2015 era, presumably renamed later | Namedrop in Room 2 screen text as a timestamp of the era |
 
 *(Add more names as we learn them from friends and family)*
 
-## Characters Per Room
+## Player Character
 
-Each room should have a unique player character that fits the life stage. The character changes as the story progresses.
+**Annie** (Gustav and Elina's daughter) is the player character throughout the entire game. She is always a small child sprite — a kid character, not an adult — regardless of which historical year she lands in. The comedy of a toddler showing up in a 2015 nightclub is intentional and should be leaned into.
 
-| Room | Character | Notes |
-|------|-----------|-------|
-| 1 – Baby Steps | Baby | Crawling/toddler sprite |
-| 2 – Single Life | TBD | Young adult, party vibe |
-| 3 – First Date | TBD | Dressed up / romantic |
-| 4 – Code in the Dark | Programmer / Emo | Dark clothes, hoodie, emo-like feel |
-| 5 – Moving In Together | TBD | Casual |
-| 6 – Baby Born | TBD | Parent |
-| 7 – Holiday Trip | TBD | Tourist |
-| 8 – The Proposal | TBD | Dressed up |
-| 9 – Wedding Day | Bride | Wedding dress sprite |
-
-📋 **TODO:** Find or create specific character sprites for each room. Current asset pack (Modern Interiors Free v2.2) has: Adam, Alex, Amelia, Bob with walk/run/idle/sit/phone animations (16x32 frames).
+📋 **TODO:** Find or assign a kid sprite for Annie. Current asset pack has kid body + outfit sheets in `moderninteriors-win/2_Characters/Character_Generator/Bodies_kids/16x16/`. Kid frames are 16x16 (square, not tall like adults).
 
 ---
 
 ## Story Intros
 
-Between each room, a story text is shown to narrate the couple's journey and introduce the next room. These are displayed as text overlays during the transition between rooms.
+Between each room, a story text is shown to narrate Annie's time-travel mission and introduce the next room. Displayed as text overlays during transitions.
 
-| Before Room | Story Intro |
-|-------------|-------------|
-| Room 4 – Code in the Dark | "Gustav och Elina växer upp, dom idrottar, dom studera och träffar varandra mene besultar sig för att gå vidare separat. Ödet verkar dock ha andra planer..." |
+| Transition | Screen text | Tone |
+|------------|------------|------|
+| Room 1 → Room 2 | "Åh nej. Annie råkade gå igenom tidsmaskinen. Hon har landat i... 2015?" | Alarm, comedy |
+| Room 2 intro | "2015 — Göteborg. Eran när klubbarna hade pingisbord och Theo Berndt fortfarande hette The Berndt. Men vad händer framför Annies ögon? Gustav är karate-full och har helt tappat bort sig i någon fuldans på dansgolvet. Samtidigt har Elina [FYLL I]. Hon måste föra dom samman på något sätt — men hur??" | Comedy, stakes |
+| Before Room 4 – Code in the Dark | "Gustav och Elina växer upp, dom idrottar, dom studerar och träffar varandra — men beslutar sig för att gå vidare separat. Ödet verkar dock ha andra planer. Och Annie är fortfarande kvar i historien." | Drama |
 
 *(Add more story intros as rooms are designed)*
 
@@ -76,30 +69,32 @@ Between each room, a story text is shown to narrate the couple's journey and int
 ## Rooms
 
 ### Room 1 – Baby Steps
-**Life stage:** Babies learning to walk
-**Objective:** Move the player around the room
+**Life stage:** Annie's nursery — the present day (no year shown)
+**Narrative:** This is Annie's own room. She is learning to walk. The door at the end of the room looks like an ordinary nursery door — but it is actually a time machine portal. Annie doesn't know this. Neither does the audience. When she reaches it, she vanishes.
+**Objective:** Move Annie around the nursery and reach the door
 **Mechanic:** Arrow key movement
 **Function:** `updatePlayerPosition(player, keysPressed)`
 - Move with arrow keys
 - Normalize diagonal movement
 - Stay inside bounds
-**Visuals:** Nursery/children's bedroom — herringbone wood floor, textured walls, crib or bunk bed, star garlands, toys on the floor, wardrobe, rug. Reference: https://img.itch.zone/aW1hZ2UvNjcxNzUxLzU5MzE1NTIuZ2lm/original/acGm9v.gif
+**Visuals:** Nursery/children's bedroom — herringbone wood floor, textured walls, crib, star garlands, toys on the floor, wardrobe, rug. The door glows faintly — a subtle hint that something is off.
 **Difficulty:** Easy
 **Status:** ✅ CONFIRMED
+**Note:** No year is shown in this room. The Level Complete text should play it as an "oh no" moment — Annie has disappeared through the portal.
 
 ---
 
 ### Room 2 – Single Life
-**Life stage:** Young adults out in the world, dodging bad decisions
-**Objective:** Dodge one night stands and other "obstacles" moving across the screen
-**Mechanic:** Obstacle avoidance — obstacles move toward the player or across the screen, player must dodge
-**Function:** `checkObstacleCollision(player, obstacles)`
-- Check if player overlaps any obstacle
-- Return true/false (engine handles life/damage)
-**Also possible:** `updateObstacles(obstacles)` — move obstacles across screen
-**Visuals:** Nightclub/bar vibe, neon colors, obstacles could be lipstick marks, drink glasses, etc.
+**Life stage:** 2015 — Göteborg. Annie lands here by accident.
+**Narrative:** Annie arrives in 2015 Göteborg, the era of ping pong tables in nightclubs and Theo Berndt still going by "The Berndt". Gustav is on the dance floor, karate-full, doing something embarrassing. Elina is [FYLL I: vad Elina gör]. Annie has to bring them together somehow.
+**Objective:** Push/guide Gustav and Elina toward each other (or to a meeting point)
+**Mechanic:** Obstacle/character pushing — the couple moves when Annie bumps into them
+**Function:** `pushCharacters(player, characters)`
+- Push characters when Annie collides with them
+- Get both characters to their target zones
+**Visuals:** Nightclub/bar, neon colors, ping pong table visible, dance floor. Gustav NPC doing bad dancing. Elina NPC doing [FYLL I].
 **Difficulty:** Easy-Medium
-**Status:** ✅ CONFIRMED
+**Status:** ✅ CONFIRMED (mechanic built, narrative needs Elina detail)
 
 ---
 

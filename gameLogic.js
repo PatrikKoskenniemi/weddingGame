@@ -23,9 +23,9 @@ function updatePlayerPosition(player, keysPressed) {
 }
 
 function pushCharacters(player, characters) {
-  // TODO: Loop over characters
-  // TODO: Calculate dx/dy between player and character
-  // TODO: If close enough, push the character away from the player
+    // TODO: Loop over characters
+    // TODO: Calculate dx/dy between player and character
+    // TODO: If close enough, push the character away from the player
 }
 
 function checkHeartCollection(player, hearts) {
