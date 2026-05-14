@@ -404,7 +404,7 @@ function drawTargetMarkers(targetCtx, targets) {
     const y = ROOM_BOUNDS.y + (t.row + 0.5) * T * S;
     const r = T * S * 0.4;
     targetCtx.save();
-    targetCtx.strokeStyle = "#44ff88";
+    targetCtx.strokeStyle = "#ffffff";
     targetCtx.lineWidth = 3;
     targetCtx.setLineDash([6, 4]);
     targetCtx.beginPath();
