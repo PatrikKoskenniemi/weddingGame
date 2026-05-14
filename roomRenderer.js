@@ -429,6 +429,65 @@ function drawRoomForeground() {
   }
 }
 
+// --- Disco Overlay ---
+
+function drawDiscoOverlay(targetCtx) {
+  const t = performance.now();
+  const w = CANVAS_WIDTH;
+  const h = CANVAS_HEIGHT;
+
+  const offscreen = document.createElement("canvas");
+  offscreen.width = w;
+  offscreen.height = h;
+  const oc = offscreen.getContext("2d");
+
+  oc.fillStyle = "rgba(0, 0, 0, 0.5)";
+  oc.fillRect(0, 0, w, h);
+
+  oc.globalCompositeOperation = "destination-out";
+
+  const rings = [
+    { rx: w * 0.38, ry: h * 0.30, r: 40, spots: [
+      { speed: 0.00080, offset: 0 },
+      { speed: 0.00060, offset: Math.PI * 1 / 3 },
+      { speed: 0.00100, offset: Math.PI * 2 / 3 },
+      { speed: 0.00070, offset: Math.PI },
+      { speed: 0.00090, offset: Math.PI * 4 / 3 },
+      { speed: 0.00055, offset: Math.PI * 5 / 3 },
+    ]},
+    { rx: w * 0.18, ry: h * 0.14, r: 30, spots: [
+      { speed: -0.00110, offset: Math.PI / 6 },
+      { speed: -0.00085, offset: Math.PI / 6 + Math.PI * 2 / 4 },
+      { speed: -0.00095, offset: Math.PI / 6 + Math.PI * 4 / 4 },
+      { speed: -0.00075, offset: Math.PI / 6 + Math.PI * 6 / 4 },
+    ]},
+  ];
+
+  const cx = w / 2;
+  const cy = h / 2;
+
+  for (const ring of rings) {
+   for (const spot of ring.spots) {
+    const angle = t * spot.speed + spot.offset;
+    const x = cx + Math.cos(angle) * ring.rx;
+    const y = cy + Math.sin(angle) * ring.ry;
+    const r = ring.r;
+
+    const grad = oc.createRadialGradient(x, y, 0, x, y, r);
+    grad.addColorStop(0,   "rgba(255,255,255,1)");
+    grad.addColorStop(0.5, "rgba(255,255,255,0.5)");
+    grad.addColorStop(1,   "rgba(255,255,255,0)");
+
+    oc.fillStyle = grad;
+    oc.beginPath();
+    oc.arc(x, y, r, 0, Math.PI * 2);
+    oc.fill();
+   }
+  }
+
+  targetCtx.drawImage(offscreen, 0, 0);
+}
+
 // --- Spotlight Overlay ---
 
 function heartPath(ctx, cx, cy, r) {

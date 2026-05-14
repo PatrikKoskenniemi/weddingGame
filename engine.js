@@ -208,6 +208,9 @@ function render() {
   if (ROOMS[currentRoomIndex].id === "coding_in_the_dark") {
     drawSpotlightOverlay(ctx);
   }
+  if (ROOMS[currentRoomIndex].id === "single_life") {
+    drawDiscoOverlay(ctx);
+  }
   drawScore();
 
   if (gameState === "levelComplete") {
