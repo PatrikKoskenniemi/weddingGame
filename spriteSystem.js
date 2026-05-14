@@ -9,7 +9,7 @@
 // Animations are rows in the sheet; frames are columns.
 const SPRITE_SHEETS = {
   player: {
-    src: "assets/sprites/player.png",
+    src: "assets/sprites/characters/sprite_annie.png",
     frameWidth: 16,
     frameHeight: 32,
     // Row 1 = idle (right 0-5, up 6-11, left 12-17, down 18-23)
@@ -23,6 +23,38 @@ const SPRITE_SHEETS = {
       walk_left:  { row: 2, col: 12, frames: 6, speed: 120 },
       idle_right: { row: 1, col: 0,  frames: 6, speed: 120 },
       walk_right: { row: 2, col: 0,  frames: 6, speed: 120 },
+    },
+  },
+  npc1: {
+    src: "assets/sprites/characters/sprite_gustav.png",
+    frameWidth: 16,
+    frameHeight: 32,
+    animations: {
+      idle_down:  { row: 1, col: 18, frames: 6, speed: 120 },
+      walk_down:  { row: 2, col: 18, frames: 6, speed: 120 },
+      idle_up:    { row: 1, col: 6,  frames: 6, speed: 120 },
+      walk_up:    { row: 2, col: 6,  frames: 6, speed: 120 },
+      idle_left:  { row: 1, col: 12, frames: 6, speed: 120 },
+      walk_left:  { row: 2, col: 12, frames: 6, speed: 120 },
+      idle_right: { row: 1, col: 0,  frames: 6, speed: 120 },
+      walk_right: { row: 2, col: 0,  frames: 6, speed: 120 },
+      dance:      { row: 11, col: 0, frames: 56, speed: 100 },
+    },
+  },
+  npc2: {
+    src: "assets/sprites/characters/sprite_elina.png",
+    frameWidth: 16,
+    frameHeight: 32,
+    animations: {
+      idle_down:  { row: 1, col: 18, frames: 6, speed: 120 },
+      walk_down:  { row: 2, col: 18, frames: 6, speed: 120 },
+      idle_up:    { row: 1, col: 6,  frames: 6, speed: 120 },
+      walk_up:    { row: 2, col: 6,  frames: 6, speed: 120 },
+      idle_left:  { row: 1, col: 12, frames: 6, speed: 120 },
+      walk_left:  { row: 2, col: 12, frames: 6, speed: 120 },
+      idle_right: { row: 1, col: 0,  frames: 6, speed: 120 },
+      walk_right: { row: 2, col: 0,  frames: 6, speed: 120 },
+      dance:      { row: 11, col: 0, frames: 56, speed: 100 },
     },
   },
   heart: {

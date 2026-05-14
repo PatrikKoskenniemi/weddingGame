@@ -35,6 +35,9 @@ let score = 0;
 
 let hearts = [];
 
+let pushables = [];
+let roomDoorUnlocked = false;
+
 function spawnHearts(count) {
   const margin = 40;
   const minX = ROOM_BOUNDS.x + margin;
@@ -117,6 +120,18 @@ async function loadRoom(roomIndex) {
   hearts = [];
   if (room.hearts) spawnHearts(8);
 
+  // Spawn pushable characters from room config
+  pushables = [];
+  roomDoorUnlocked = false;
+  if (room.pushables) {
+    const npcKeys = ["npc1", "npc2"];
+    for (let i = 0; i < room.pushables.length; i++) {
+      const pos = spawnToCanvas(room.pushables[i]);
+      const key = npcKeys[i] || "npc1";
+      pushables.push({ x: pos.x, y: pos.y, size: 64, sprite: createSpriteAnimation(key, "dance") });
+    }
+  }
+
   gameState = "playing";
 }
 
@@ -162,6 +177,14 @@ function drawHearts() {
   }
 }
 
+function drawPushables() {
+  const room = ROOMS[currentRoomIndex];
+  if (room.targets) drawTargetMarkers(ctx, room.targets);
+  for (const p of pushables) {
+    drawSprite(ctx, p.sprite, p.x, p.y, p.size, p.size * 2, "#ff8844");
+  }
+}
+
 function drawScore() {
   ctx.fillStyle = "#ffffff";
   ctx.font = "bold 36px monospace";
@@ -180,6 +203,7 @@ function render() {
   drawRoomForeground();
   if (ROOMS[currentRoomIndex].showTitle !== false) drawRoomTitle(ctx);
   drawHearts();
+  drawPushables();
   drawPlayer();
   if (ROOMS[currentRoomIndex].id === "coding_in_the_dark") {
     drawSpotlightOverlay(ctx);
@@ -210,8 +234,24 @@ function gameLoop(currentTime) {
     updatePlayerPosition(player, keysPressed);
     score += checkHeartCollection(player, hearts);
 
-    // Check if player reached the door
-    if (checkDoorCollision()) {
+    // Push characters and clamp to room bounds
+    if (pushables.length > 0) {
+      pushCharacters(player, pushables);
+      for (const p of pushables) {
+        p.x = Math.max(ROOM_BOUNDS.x + p.size / 2, Math.min(ROOM_BOUNDS.x + ROOM_BOUNDS.w - p.size / 2, p.x));
+        p.y = Math.max(ROOM_BOUNDS.y + ROOM_BOUNDS.wallHeight + p.size / 2, Math.min(ROOM_BOUNDS.y + ROOM_BOUNDS.h - p.size / 2, p.y));
+      }
+      // Unlock door when all pushables are on their targets
+      const room = ROOMS[currentRoomIndex];
+      roomDoorUnlocked = pushables.every((p, i) => {
+        const t = spawnToCanvas(room.targets[i]);
+        return Math.abs(p.x - t.x) < 35 && Math.abs(p.y - t.y) < 35;
+      });
+    }
+
+    // Check if player reached the door (requires pushables solved if room has them)
+    const doorBlocked = pushables.length > 0 && !roomDoorUnlocked;
+    if (checkDoorCollision() && !doorBlocked) {
       gameState = "levelComplete";
     }
 
@@ -225,6 +265,9 @@ function gameLoop(currentTime) {
   updateSpriteAnimation(player.sprite, deltaTime);
   for (const heart of hearts) {
     updateSpriteAnimation(heart.sprite, deltaTime);
+  }
+  for (const p of pushables) {
+    updateSpriteAnimation(p.sprite, deltaTime);
   }
 
   // Draw everything

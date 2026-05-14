@@ -25,8 +25,16 @@ const ROOMS = [
     year: "2015",
     title: "Single Life",
     door: { col: 15, row: 2, w: 2, h: 3 },
-    spawn: { col: 2, row: 8 },
+    spawn: { col: 6, row: 9 },
     hearts: false,
+    pushables: [
+      { col: 2, row: 7 },
+      { col: 12, row: 8 },
+    ],
+    targets: [
+      { col: 9, row: 6.2 },
+      { col: 9, row: 10.1},
+    ],
   },
   {
     id: "coding_in_the_dark",
@@ -293,6 +301,7 @@ function renderTileLayer(rc, layer, mapW, offsetX, offsetY, collectAnims) {
 
     const col = i % mapW;
     const row = Math.floor(i / mapW);
+
     const dx = offsetX + col * T * S;
     const dy = offsetY + row * T * S;
 
@@ -387,6 +396,22 @@ function drawRoomTitle(targetCtx) {
   }
 
   targetCtx.restore();
+}
+
+function drawTargetMarkers(targetCtx, targets) {
+  for (const t of targets) {
+    const x = ROOM_BOUNDS.x + (t.col + 0.5) * T * S;
+    const y = ROOM_BOUNDS.y + (t.row + 0.5) * T * S;
+    const r = T * S * 0.4;
+    targetCtx.save();
+    targetCtx.strokeStyle = "#44ff88";
+    targetCtx.lineWidth = 3;
+    targetCtx.setLineDash([6, 4]);
+    targetCtx.beginPath();
+    targetCtx.arc(x, y, r, 0, Math.PI * 2);
+    targetCtx.stroke();
+    targetCtx.restore();
+  }
 }
 
 function drawRoomBackground() {

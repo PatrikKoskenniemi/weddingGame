@@ -22,6 +22,12 @@ function updatePlayerPosition(player, keysPressed) {
 
 }
 
+function pushCharacters(player, characters) {
+  // TODO: Loop over characters
+  // TODO: Calculate dx/dy between player and character
+  // TODO: If close enough, push the character away from the player
+}
+
 function checkHeartCollection(player, hearts) {
   // TODO: Check if player overlaps any hearts
   // TODO: Remove collected hearts from the array
