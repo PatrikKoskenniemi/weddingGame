@@ -201,7 +201,6 @@ function render() {
   drawBackground();
   drawAnimatedTiles(ctx);
   drawRoomForeground();
-  if (ROOMS[currentRoomIndex].showTitle !== false) drawRoomTitle(ctx);
   drawHearts();
   drawPushables();
   drawPlayer();
@@ -211,6 +210,7 @@ function render() {
   if (ROOMS[currentRoomIndex].id === "single_life") {
     drawDiscoOverlay(ctx);
   }
+  if (ROOMS[currentRoomIndex].showTitle !== false) drawRoomTitle(ctx);
   drawScore();
 
   if (gameState === "levelComplete") {
