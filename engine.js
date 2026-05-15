@@ -37,6 +37,7 @@ let hearts = [];
 
 let pushables = [];
 let roomDoorUnlocked = false;
+let codingDarkUnlocked = false;
 
 function spawnHearts(count) {
   const margin = 40;
@@ -118,6 +119,7 @@ async function loadRoom(roomIndex) {
 
   // Reset hearts for new room
   hearts = [];
+  codingDarkUnlocked = false;
   if (room.hearts) spawnHearts(8);
 
   // Spawn pushable characters from room config
@@ -205,7 +207,7 @@ function render() {
   drawPushables();
   drawPlayer();
   if (ROOMS[currentRoomIndex].id === "coding_in_the_dark") {
-    drawSpotlightOverlay(ctx);
+    drawSpotlightOverlay(ctx, player, codingDarkUnlocked);
   }
   if (ROOMS[currentRoomIndex].id === "single_life") {
     drawDiscoOverlay(ctx);
@@ -220,7 +222,7 @@ function render() {
 
 // --- Heart Respawn ---
 function checkRespawn() {
-  if (hearts.length === 0 && ROOMS[currentRoomIndex].hearts) {
+  if (hearts.length === 0 && ROOMS[currentRoomIndex].hearts && !codingDarkUnlocked) {
     spawnHearts(8);
   }
 }
@@ -236,6 +238,10 @@ function gameLoop(currentTime) {
     // Update logic (calls functions from gameLogic.js)
     updatePlayerPosition(player, keysPressed);
     score += checkHeartCollection(player, hearts);
+
+    if (hearts.length === 0 && ROOMS[currentRoomIndex].id === "coding_in_the_dark") {
+      codingDarkUnlocked = true;
+    }
 
     // Push characters and clamp to room bounds
     if (pushables.length > 0) {

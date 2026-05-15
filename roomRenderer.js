@@ -42,7 +42,7 @@ const ROOMS = [
     year: "",
     title: "Code in the Dark",
     door: { col: 14, row: 2, w: 2, h: 3 },
-    spawn: { col: 2, row: 5 },
+    spawn: { col: 2.5, row: 6.5 },
     hearts: true,
     showTitle: false,
   },
@@ -80,6 +80,7 @@ let roomAnimatedTiles = [];
 //   roomBackgroundAbove: transparent + all layers above the last animated layer
 let roomBackgroundBelow = null;
 let roomBackgroundAbove = null;
+let spotlightUnlockTime = null;
 
 // --- GID Resolution ---
 
@@ -244,6 +245,7 @@ function makeCanvas() {
 
 function composeRoom(mapData) {
   roomAnimatedTiles = [];
+  spotlightUnlockTime = null;
 
   const mapW = mapData.width;
   const mapH = mapData.height;
@@ -505,7 +507,7 @@ function heartPath(ctx, cx, cy, r) {
   ctx.restore();
 }
 
-function drawSpotlightOverlay(targetCtx) {
+function drawSpotlightOverlay(targetCtx, player, unlocked) {
   const offscreen = document.createElement("canvas");
   offscreen.width = CANVAS_WIDTH;
   offscreen.height = CANVAS_HEIGHT;
@@ -516,31 +518,61 @@ function drawSpotlightOverlay(targetCtx) {
 
   oc.globalCompositeOperation = "destination-out";
 
-  // Clear the north wall so wall images are fully visible
-  oc.fillStyle = "rgba(255,255,255,1)";
-  oc.fillRect(6.13 * T * S, 6, 495, 166);
-
-  const spots = [
-    { col: 8, row: 5.5 },
-  ];
-
-  const r = 185;
-  for (const spot of spots) {
-    const cx = ROOM_BOUNDS.x + spot.col * T * S;
-    const cy = ROOM_BOUNDS.y + spot.row * T * S;
-
-    oc.save();
-    heartPath(oc, cx, cy, r);
-    oc.clip();
-
-    const grad = oc.createRadialGradient(cx, cy, 0, cx, cy, r * 1.95);
+  if (!unlocked) {
+    spotlightUnlockTime = null;
+    // Always keep the north wall (logo/screen) fully visible
+    oc.fillStyle = "rgba(255,255,255,1)";
+    oc.fillRect(6.13 * T * S, 6, 495, 166);
+    // Phase 1: circle following the player
+    const r = 140;
+    const grad = oc.createRadialGradient(player.x, player.y, 0, player.x, player.y, r);
     grad.addColorStop(0,   "rgba(255,255,255,1)");
-    grad.addColorStop(0.2, "rgba(255,255,255,0.8)");
+    grad.addColorStop(0.6, "rgba(255,255,255,0.8)");
     grad.addColorStop(1,   "rgba(255,255,255,0)");
     oc.fillStyle = grad;
-    oc.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+    oc.beginPath();
+    oc.arc(player.x, player.y, r, 0, Math.PI * 2);
+    oc.fill();
+  } else {
+    if (spotlightUnlockTime === null) spotlightUnlockTime = performance.now();
 
-    oc.restore();
+    const ANIM_DURATION = 1500;
+    const progress = Math.min((performance.now() - spotlightUnlockTime) / ANIM_DURATION, 1);
+    const ease = 1 - Math.pow(1 - progress, 3);
+
+    const r = 185;
+    const cx = ROOM_BOUNDS.x + 8 * T * S;
+    const cy = ROOM_BOUNDS.y + 5.5 * T * S;
+
+    const drawHalfHeart = (clipX, clipW, offset) => {
+      oc.save();
+      oc.beginPath();
+      oc.rect(clipX, 0, clipW, CANVAS_HEIGHT);
+      oc.clip();
+      oc.translate(offset, 0);
+      heartPath(oc, cx, cy, r);
+      oc.clip();
+      const grad = oc.createRadialGradient(cx, cy, 0, cx, cy, r * 1.95);
+      grad.addColorStop(0,   "rgba(255,255,255,1)");
+      grad.addColorStop(0.2, "rgba(255,255,255,0.8)");
+      grad.addColorStop(1,   "rgba(255,255,255,0)");
+      oc.fillStyle = grad;
+      oc.fillRect(-CANVAS_WIDTH * 2, -CANVAS_HEIGHT, CANVAS_WIDTH * 5, CANVAS_HEIGHT * 3);
+      oc.restore();
+    };
+
+    if (progress >= 1) {
+      // Animation done — draw full heart + clear north wall
+      oc.fillStyle = "rgba(255,255,255,1)";
+      oc.fillRect(6.13 * T * S, 6, 495, 166);
+      drawHalfHeart(0, cx, 0);
+      drawHalfHeart(cx, CANVAS_WIDTH - cx, 0);
+    } else {
+      const leftOffset  = -(cx + r) * (1 - ease);
+      const rightOffset =  (CANVAS_WIDTH - cx + r) * (1 - ease);
+      drawHalfHeart(0, cx, leftOffset);
+      drawHalfHeart(cx, CANVAS_WIDTH - cx, rightOffset);
+    }
   }
 
   targetCtx.drawImage(offscreen, 0, 0);
