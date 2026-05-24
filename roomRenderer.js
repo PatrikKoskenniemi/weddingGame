@@ -126,9 +126,12 @@ function resolveGid(gid) {
 
   const col = localId % ts.columns;
   const row = Math.floor(localId / ts.columns);
+  const tw = ts.tileWidth || T;
+  const th = ts.tileHeight || T;
+  const sp = ts.spacing || 0;
   const img = SpriteLoader.get(ts.src);
 
-  return img ? { img, sx: col * T, sy: row * T } : null;
+  return img ? { img, sx: col * (tw + sp), sy: row * (th + sp) } : null;
 }
 
 // --- Tileset Loading ---
@@ -211,7 +214,10 @@ async function loadTilesets(mapData, mapUrl) {
         if (frames.length > 0) animations[localId] = frames;
       }
 
-      tilesets.push({ firstgid: ts.firstgid, columns, src: imgPath, animations });
+      const tileWidth = Number.parseInt(doc.querySelector("tileset").getAttribute("tilewidth") || "16");
+      const tileHeight = Number.parseInt(doc.querySelector("tileset").getAttribute("tileheight") || "16");
+      const spacing = Number.parseInt(doc.querySelector("tileset").getAttribute("spacing") || "0");
+      tilesets.push({ firstgid: ts.firstgid, columns, src: imgPath, animations, tileWidth, tileHeight, spacing });
     } catch (e) {
       console.warn("Failed to load tileset:", tsxPath, e);
     }
@@ -251,8 +257,8 @@ function collectAnimatedTile(gid, dx, dy, dw, dh) {
     dx, dy, dw, dh, flipH, flipV,
     frames: ts.animations[localId].map(f => ({
       img,
-      sx: (f.tileid % ts.columns) * T,
-      sy: Math.floor(f.tileid / ts.columns) * T,
+      sx: (f.tileid % ts.columns) * ((ts.tileWidth || T) + (ts.spacing || 0)),
+      sy: Math.floor(f.tileid / ts.columns) * ((ts.tileHeight || T) + (ts.spacing || 0)),
       duration: f.duration,
     })),
     elapsed: 0,
@@ -276,8 +282,8 @@ function assembleTileData(layer, mapW, mapH) {
   const data = new Array(mapW * mapH).fill(0);
   for (const chunk of layer.chunks) {
     for (let i = 0; i < chunk.data.length; i++) {
-      const cx = (i % chunk.width) + chunk.x - (layer.startx || 0);
-      const cy = Math.floor(i / chunk.width) + chunk.y - (layer.starty || 0);
+      const cx = (i % chunk.width) + chunk.x;
+      const cy = Math.floor(i / chunk.width) + chunk.y;
       if (cx >= 0 && cx < mapW && cy >= 0 && cy < mapH) {
         data[cy * mapW + cx] = chunk.data[i];
       }
