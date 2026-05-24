@@ -10,7 +10,10 @@ const CANVAS_WIDTH = canvas.width;
 const CANVAS_HEIGHT = canvas.height;
 
 // --- Game State ---
-let gameState = "loading"; // "loading" | "playing" | "levelComplete"
+let gameState = "loading"; // "loading" | "playing" | "dissolving" | "timeMachine" | "levelComplete"
+let timeMachineElapsed = 0;
+let dissolveElapsed = 0;
+const DISSOLVE_DURATION = 2500;
 let currentRoomIndex = 0;
 
 // Restore room from URL hash (e.g. #room=1) so refresh stays on same room
@@ -70,8 +73,8 @@ window.addEventListener("keydown", (e) => {
     e.preventDefault();
   }
 
-  // Space dismisses level complete popup
-  if (gameState === "levelComplete" && e.key === " ") {
+  // Space dismisses level complete popup or time machine screen
+  if ((gameState === "levelComplete" || gameState === "timeMachine") && e.key === " ") {
     advanceToNextRoom();
     e.preventDefault();
   }
@@ -200,6 +203,13 @@ function drawBackground() {
 }
 
 function render() {
+  if (gameState === "dissolving") {
+    ctx.save();
+    ctx.translate(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
+    ctx.rotate(dissolveElapsed * 0.01);
+    ctx.translate(-CANVAS_WIDTH / 2, -CANVAS_HEIGHT / 2);
+  }
+
   drawBackground();
   drawAnimatedTiles(ctx);
   drawRoomForeground();
@@ -215,8 +225,16 @@ function render() {
   if (ROOMS[currentRoomIndex].showTitle !== false) drawRoomTitle(ctx);
   drawScore();
 
+  if (gameState === "dissolving") {
+    ctx.restore();
+    drawDissolveOverlay(ctx, dissolveElapsed / DISSOLVE_DURATION, dissolveElapsed);
+  }
+
   if (gameState === "levelComplete") {
     drawLevelComplete(ctx, ROOMS[currentRoomIndex]);
+  }
+  if (gameState === "timeMachine") {
+    drawTimeMachineScreen(ctx, timeMachineElapsed);
   }
 }
 
@@ -261,7 +279,13 @@ function gameLoop(currentTime) {
     // Check if player reached the door (requires pushables solved if room has them)
     const doorBlocked = pushables.length > 0 && !roomDoorUnlocked;
     if (checkDoorCollision() && !doorBlocked) {
-      gameState = "levelComplete";
+      if (ROOMS[currentRoomIndex].id === "learn_to_walk") {
+        gameState = "dissolving";
+        dissolveElapsed = 0;
+        initDissolve();
+      } else {
+        gameState = "levelComplete";
+      }
     }
 
     // Respawn hearts when all collected
@@ -279,6 +303,15 @@ function gameLoop(currentTime) {
     updateSpriteAnimation(p.sprite, deltaTime);
   }
 
+  if (gameState === "dissolving") {
+    dissolveElapsed += deltaTime;
+    if (dissolveElapsed >= DISSOLVE_DURATION) {
+      gameState = "timeMachine";
+      timeMachineElapsed = 0;
+    }
+  }
+  if (gameState === "timeMachine") timeMachineElapsed += deltaTime;
+
   // Draw everything
   render();
 
@@ -289,6 +322,7 @@ function gameLoop(currentTime) {
 // Preload sprite sheets + tileset images, then load first room and start
 const allLoads = [
   SpriteLoader.preloadAll(SPRITE_SHEETS),
+  SpriteLoader.load("assets/images/time_spiral.webp"),
 ];
 Promise.allSettled(allLoads).then(async () => {
   await loadRoom(currentRoomIndex);

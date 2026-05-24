@@ -13,10 +13,10 @@ const ROOMS = [
   {
     id: "learn_to_walk",
     map: "assets/maps/learn_to_walk.json",
-    year: "1993",
-    title: "Learn to Walk",
-    door: { col: 15, row: 2, w: 2, h: 3 },
-    spawn: { col: 6.3, row: 8 },
+    year: "2024",
+    title: "Baby steps",
+    door: { col: 14.5, row: 1, w: 2, h: 3 },
+    spawn: { col: 6.3, row: 7 },
     hearts: false,
   },
   {
@@ -642,6 +642,125 @@ function drawSpotlightOverlay(targetCtx, player, unlocked) {
 }
 
 // --- Level Complete Overlay ---
+
+// --- Dissolve Transition ---
+
+let dissolveBlocks = [];
+
+function initDissolve() {
+  const cols = Math.ceil(CANVAS_WIDTH / (T * S));
+  const rows = Math.ceil(CANVAS_HEIGHT / (T * S));
+  dissolveBlocks = [];
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      dissolveBlocks.push({ x: c * T * S, y: r * T * S });
+    }
+  }
+  for (let i = dissolveBlocks.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [dissolveBlocks[i], dissolveBlocks[j]] = [dissolveBlocks[j], dissolveBlocks[i]];
+  }
+}
+
+function drawDissolveOverlay(targetCtx, progress, elapsed) {
+  // Blocks blink randomly; density increases toward full black at progress=1
+  const density = Math.min(1, progress + 0.1);
+  targetCtx.fillStyle = "#000000";
+  for (const block of dissolveBlocks) {
+    if (Math.random() < density) {
+      targetCtx.fillRect(block.x, block.y, T * S, T * S);
+    }
+  }
+
+  // Warning triangle — blinks red/white
+  const cx = CANVAS_WIDTH / 2;
+  const cy = CANVAS_HEIGHT / 2;
+  const th = 280;
+  const tw = th / Math.sqrt(3) * 2;
+
+  targetCtx.save();
+  targetCtx.beginPath();
+  targetCtx.moveTo(cx, cy - th * 0.65);
+  targetCtx.lineTo(cx - tw / 2, cy + th * 0.35);
+  targetCtx.lineTo(cx + tw / 2, cy + th * 0.35);
+  targetCtx.closePath();
+
+  const blink = Math.floor(elapsed / 220) % 2 === 0;
+  targetCtx.fillStyle = blink ? "#ff2200" : "#000000";
+  targetCtx.fill();
+  targetCtx.strokeStyle = blink ? "#000000" : "#ff2200";
+  targetCtx.lineWidth = 6;
+  targetCtx.stroke();
+
+  // Exclamation mark inside triangle
+  targetCtx.fillStyle = blink ? "#000000" : "#ff2200";
+  targetCtx.font = "bold 120px monospace";
+  targetCtx.textAlign = "center";
+  targetCtx.textBaseline = "middle";
+  targetCtx.fillText("!", cx, cy + 20);
+
+  targetCtx.restore();
+}
+
+function drawTimeMachineScreen(targetCtx, elapsed) {
+  const img = SpriteLoader.get("assets/images/time_spiral.webp");
+  if (!img) return;
+
+  const cx = CANVAS_WIDTH / 2;
+  const cy = CANVAS_HEIGHT / 2;
+
+  // Draw spiral image scaled to cover canvas with slow rotation + subtle breathe
+  const diagonal = Math.hypot(CANVAS_WIDTH, CANVAS_HEIGHT);
+  const baseScale = diagonal / Math.min(img.naturalWidth, img.naturalHeight);
+  const pulse = 1 + 0.02 * Math.sin(elapsed / 900);
+  const scale = baseScale * pulse;
+  const dw = img.naturalWidth * scale;
+  const dh = img.naturalHeight * scale;
+
+  targetCtx.save();
+  targetCtx.translate(cx, cy);
+  targetCtx.rotate(elapsed * 0.00015);
+  targetCtx.drawImage(img, -dw / 2, -dh / 2, dw, dh);
+  targetCtx.restore();
+
+  // Dark vignette
+  const vignette = targetCtx.createRadialGradient(cx, cy, CANVAS_HEIGHT * 0.2, cx, cy, CANVAS_HEIGHT * 0.85);
+  vignette.addColorStop(0, "rgba(0,0,0,0)");
+  vignette.addColorStop(1, "rgba(0,0,0,0.75)");
+  targetCtx.fillStyle = vignette;
+  targetCtx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+  // Scanlines
+  targetCtx.fillStyle = "rgba(0,0,0,0.12)";
+  for (let y = 0; y < CANVAS_HEIGHT; y += 4) {
+    targetCtx.fillRect(0, y, CANVAS_WIDTH, 2);
+  }
+
+  // Title
+  targetCtx.save();
+  targetCtx.textAlign = "center";
+  targetCtx.textBaseline = "middle";
+
+  targetCtx.font = "bold 52px monospace";
+  targetCtx.fillStyle = "rgba(0,0,0,0.5)";
+  targetCtx.fillText("TRAVELLING THROUGH TIME...", cx + 3, cy - 40 + 3);
+  targetCtx.fillStyle = "#f0e040";
+  targetCtx.fillText("TRAVELLING THROUGH TIME...", cx, cy - 40);
+
+  // Year display
+  targetCtx.font = "bold 32px monospace";
+  targetCtx.fillStyle = "#ffffff";
+  targetCtx.fillText("1993  →  2015", cx, cy + 20);
+
+  // Flashing "press space"
+  if (Math.floor(elapsed / 500) % 2 === 0) {
+    targetCtx.font = "22px monospace";
+    targetCtx.fillStyle = "rgba(255,255,255,0.7)";
+    targetCtx.fillText("Press space to continue...", cx, cy + 80);
+  }
+
+  targetCtx.restore();
+}
 
 function drawLevelComplete(targetCtx, roomInfo) {
   // Semi-transparent dark backdrop
