@@ -54,7 +54,9 @@ Tryck Enter för att börja
 
 ---
 
-## RUM 1 – Baby Steps
+## RUM 0 – Baby Steps
+
+> **MUSIKNOT:** Musik startar här när spelet laddas. Se teknisk not om musik längst ner.
 
 **SKÄRM (intro, visas före rummet laddas):**
 ```
@@ -165,92 +167,41 @@ Det fick räcka.
 
 ---
 
-## ÖVERGÅNG → RUM 3
+## ÖVERGÅNG → RUM 2
 
 **SKÄRM:**
 ```
-Ibland möts rätt personer
-vid fel tidpunkt.
+Göteborg är en liten stad
+när man vill det.
 
-Men de möttes.
+De kände folk som kände folk.
 
-— [FYLL I: ÅR] —
+Och så en kväll —
+Code in the Dark.
 ```
 
 **MANUS:**
 
-> "De träffades faktiskt. [FYLL I: kontext — hur de möttes, gemensamma vänner, händelse?]
+> "Annie följer spåren. Gustav och Elina är i samma stad, i samma kretsar. Det händer saker.
 >
-> Första dejten. Man lägger ifrån sig sin singelliv-manual och försöker vara en normal människa. Det är svårare än det låter."
+> Code in the Dark är ett event där man kodar HTML och CSS live, inför publik, utan att se resultatet förrän timern löper ut. Ingen skärm. Bara kod och mörker.
+>
+> Gustav var där. Elina var där. Och något sprakade till."
 
 ---
 
-## RUM 3 – Första dejten
-
-**SKÄRM (intro):**
-```
-[FYLL I: ÅR]
-Göteborg
-
-Hitta varandra.
-```
-
-**MANUS (innan de börjar koda):**
-
-> "Rum tre. Första dejten. Det handlar om att navigera mot varandra — metaforiskt och bokstavligt.
->
-> [FYLL I: uppgiftsbeskrivning beroende på vad mechanic:en blir]"
-
-**[RUMMET SPELAS]**
-
-**SKÄRM (Level Complete):**
-```
-Level Complete!
-Första dejten — Avklarad
-
-Andra dejten bokad.
-```
-
-**MANUS:**
-
-> "Det gick bra. Tillräckligt bra för en andra dejt, åtminstone.
->
-> Men livet är sällan rakt. Ibland behöver man tid. Ibland väljer man att gå vidare. Gustav och Elina bestämde sig för att gå var sin väg."
-
----
-
-## ÖVERGÅNG → RUM 4
-
-**SKÄRM:**
-```
-Gustav och Elina växte upp.
-De idrottade.
-De studerade.
-De träffades — och valde att gå vidare.
-
-Ödet verkar dock ha andra planer.
-```
-
-**MANUS:**
-
-> "Inte alla kärlekshistorier är raka linjer. Den här var lite mer... rekursiv.
->
-> [FYLL I: år] — Stockholm. Ett event kallat Code in the Dark. Konceptet är enkelt: du kodar HTML och CSS live, inför publik, utan att se resultatet förrän timern löper ut.
->
-> Gustav var där. Elina var där. De visste att den andre var där. Ingen sa det högt. Men man kollar på folk man känner. Och ibland kollar de tillbaka."
-
----
-
-## RUM 4 – Code in the Dark
+## RUM 2 – Code in the Dark
 
 **SKÄRM (intro — inget år, ingen titel visas automatiskt):**
 *(Spotlighten och mörkret talar för sig själva)*
 
 **MANUS (innan de börjar koda):**
 
-> "Det här rummet är mörkt. Det är meningen. Hitta hjärtana i mörkret. Precis som man hittar tillbaka till någon man faktiskt saknar.
+> "Det här rummet är mörkt. Det är meningen.
 >
-> Funktionen heter `checkHeartCollection`. Samla hjärtana."
+> Annie behöver hjälpa kärleken att hitta fram. Samla hjärtana i mörkret.
+>
+> Funktionen heter `checkHeartCollection`. Kör."
 
 **[RUMMET SPELAS]**
 
@@ -259,246 +210,40 @@ De träffades — och valde att gå vidare.
 Level Complete!
 Code in the Dark
 
-De hittade tillbaka.
+Där sprakade det.
 ```
 
 **MANUS:**
 
-> "Och de hittade tillbaka. Precis som det brukar gå när ödet bestämmer sig.
+> "Och där, i mörkret, sprakade det till.
 >
-> [FYLL I: nåt specifikt om vad som hände den kvällen om ni vill dela det — eller håll det privat och gå vidare]
+> [FYLL I: något specifikt om den kvällen om ni vill dela det — eller hoppa direkt vidare]
 >
-> Det var inte frågan om om längre. Det var frågan om när."
+> Annie andades ut. Uppdraget var inte klart — men det viktigaste steget var taget."
 
 ---
 
-## ÖVERGÅNG → RUM 5
+## ÖVERGÅNG → RUM 3
 
 **SKÄRM:**
 ```
-Den här gången var det på allvar.
+Allt som följde
+vet ni redan.
 
-Lägenheten hittades.
-Nyckeln lämnades över.
-Kartonger packades upp.
+Det finns bara ett rum kvar.
 
-— [FYLL I: ÅR] —
+Idag.
 ```
 
 **MANUS:**
 
-> "Att flytta ihop är en av livets större logistiska bragder. Man har dubbel uppsättning av allt. Ingen vet var grejerna ska stå. Man bråkar lite om det. Man kompromissar. Till slut ser det ut som ett hem.
+> "Ni har följt Annie genom Annies barnkammare, genom 2015 och pingisbordsklubbar, genom Code in the Dark och det där ögonblicket.
 >
-> Rum fem är om precis det."
+> Det finns ett rum kvar. Det sista. Det som är anledningen till att vi alla är här ikväll."
 
 ---
 
-## RUM 5 – Flytta ihop
-
-**SKÄRM (intro):**
-```
-[FYLL I: ÅR]
-Göteborg
-
-Hitta rätt plats för allt.
-Inklusive varandra.
-```
-
-**MANUS (innan de börjar koda):**
-
-> "Möblerna ska på rätt ställe. Uppgiften är att knuffa karaktärerna till målzonerna — de gröna cirklarna på golvet. Precis som att flytta ihop: trycka saker till rätt plats tills det känns som hemma.
->
-> Funktionen heter `checkPlacement`. Kör."
-
-**[RUMMET SPELAS]**
-
-**SKÄRM (Level Complete):**
-```
-Level Complete!
-[FYLL I: ÅR] — Flytta ihop
-
-Hemma.
-```
-
-**MANUS:**
-
-> "Allting på plats. Lägenheten är ett hem. Och livet gick vidare.
->
-> Sedan kom något som ändrar allting."
-
----
-
-## ÖVERGÅNG → RUM 6
-
-**SKÄRM:**
-```
-[FYLL I: ÅR]
-
-[FYLL I: dotterns namn] kom till världen.
-
-Världen såg annorlunda ut
-på andra sidan.
-```
-
-**MANUS:**
-
-> "Rum sex är lite kaotiskt. Det är det med avsikt.
->
-> [FYLL I: dotterns namn] anlände. [FYLL I: datum om ni vill]. Saker faller ned från ingenstans. Nappflaskor, blöjor, nallebjörnar. Man måste fånga dem. Man sover för lite. Man är lycklig på ett sätt man inte riktigt förstod var möjligt."
-
----
-
-## RUM 6 – Bebis
-
-**SKÄRM (intro):**
-```
-[FYLL I: ÅR]
-
-[FYLL I: dotterns namn] har anlänt.
-
-Fånga allt som faller.
-```
-
-**MANUS (innan de börjar koda):**
-
-> "Saker faller ned ovanifrån. Fånga dem. Det är hela jobbet.
->
-> Funktionerna heter `updateFallingItems` och `checkCatch`. En del av det första föräldraskapet är precis så här — man reagerar, man fångar, man improviserar. Börja."
-
-**[RUMMET SPELAS]**
-
-**SKÄRM (Level Complete):**
-```
-Level Complete!
-[FYLL I: ÅR] — Bebis
-
-Inget tappades.
-Inte på riktigt ändå.
-```
-
-**MANUS:**
-
-> "Imponerande. Inget tappades — varken i spelet eller i verkligheten.
->
-> Men en familj stannar inte stilla. De reser."
-
----
-
-## ÖVERGÅNG → RUM 7
-
-**SKÄRM:**
-```
-En del minnen sitter i platser.
-
-[FYLL I: resmål — t.ex. Thailand, Portugal, Spanien]
-
-Solen var varm.
-[FYLL I: dotterns namn] var liten.
-Livet var bra.
-```
-
-**MANUS:**
-
-> "Rum sju är om en resa som sitter kvar. [FYLL I: vilket land/plats och lite kontext om vad som hände — vad minns ni från den resan?]
->
-> Man rullar framåt. Man samlar på sig minnen. Man undviker det som inte behövs."
-
----
-
-## RUM 7 – Semesterresan
-
-**SKÄRM (intro):**
-```
-[FYLL I: ÅR]
-[FYLL I: Resmål]
-
-Rulla framåt.
-Samla minnena.
-```
-
-**MANUS (innan de börjar koda):**
-
-> "Världen scrollar förbi. Samla souvenirerna, undvik hindren. Funktionen heter `updateScroll`. Kör."
-
-**[RUMMET SPELAS]**
-
-**SKÄRM (Level Complete):**
-```
-Level Complete!
-[FYLL I: ÅR] — [FYLL I: Resmål]
-
-Minnet sitter kvar.
-```
-
-**MANUS:**
-
-> "Bra jobbat. Alla minnen på plats.
->
-> Det var strax efter det — eller kanske under — [FYLL I: om ni vill], som Gustav bestämde sig.
->
-> Eller kanske hade han bestämt sig länge. Det spelar ingen roll när. Det spelar roll hur."
-
----
-
-## ÖVERGÅNG → RUM 8
-
-**SKÄRM:**
-```
-[FYLL I: ÅR]
-[FYLL I: plats för frieriet]
-
-En fråga.
-Ett svar.
-
-Det tog [FYLL I: hur lång tid] sekunder
-att säga ja.
-```
-
-**MANUS:**
-
-> "Rum åtta. Frieriet. [FYLL I: berättelsen om hur det gick till — plats, hur det gick till, vad Elina sa, om det var en överraskning eller inte].
->
-> I spelet handlar det om att ta sig till målet. Det är metaforiskt. Allt är metaforiskt i det här spelet."
-
----
-
-## RUM 8 – Frieriet
-
-**SKÄRM (intro):**
-```
-[FYLL I: ÅR]
-[FYLL I: Plats]
-
-Nå fram.
-```
-
-**MANUS (innan de börjar koda):**
-
-> "[FYLL I: uppgiftsbeskrivning beroende på vad mechanic:en blir]
->
-> Det är enkelt. Nå fram. Precis som att fria."
-
-**[RUMMET SPELAS]**
-
-**SKÄRM (Level Complete):**
-```
-Level Complete!
-[FYLL I: ÅR] — Frieriet
-
-Hon sa ja.
-```
-
-**MANUS:**
-
-> "Och nu är vi här.
->
-> I det sista rummet.
->
-> Idag."
-
----
-
-## ÖVERGÅNG → RUM 9
+## RUM 3 – Bröllopet
 
 **SKÄRM:**
 ```
@@ -517,8 +262,6 @@ Slutligen.
 > Det sista rummet handlar om hjärtan. Massor av hjärtan. Precis som det ska."
 
 ---
-
-## RUM 9 – Bröllopsdagen
 
 **SKÄRM (intro):**
 ```
@@ -544,20 +287,20 @@ Alla av dem.
 GAME COMPLETE
 
 Gustav & Elina
-1993 → Alltid
+För alltid
 
 Grattis.
 ```
 
 **MANUS (avslutning):**
 
-> "Det var allt. Spelet är färdigt.
+> "Det var allt. Spelet är färdigt. Annie är hemma.
 >
 > Gustav och Elina har precis kodat sin kärlekshistoria. Live. Inför er alla.
 >
 > Det kanske inte var exakt vad ni förväntade er av en bröllopsmottagning. Men det är precis vad de är. De kodar saker. De gör dem på sitt eget vis. Och nu ska de göra resten av livet på samma sätt.
 >
-> Stå upp om ni kan — [FYLL I: överlämna till nästa punkt på programmet / tala om att maten serveras / be om en applåd för brudparet]."
+> Stå upp — [FYLL I: överlämna till nästa punkt / maten serveras / applåd för brudparet]."
 
 ---
 
@@ -565,15 +308,34 @@ Grattis.
 
 | Rum | År | Titel | Funktion(er) att koda |
 |-----|-----|-------|------------------------|
-| 1 | 1993 | Baby Steps | `updatePlayerPosition` |
-| 2 | 2015 | Single Life | `pushCharacters` |
-| 3 | [FYLL I] | Första dejten | TBD |
-| 4 | [FYLL I] | Code in the Dark | `checkHeartCollection` |
-| 5 | [FYLL I] | Flytta ihop | `checkPlacement` |
-| 6 | [FYLL I] | Bebis | `updateFallingItems` + `checkCatch` |
-| 7 | [FYLL I] | Semesterresan | `updateScroll` |
-| 8 | [FYLL I] | Frieriet | TBD |
-| 9 | Idag | Bröllopsdagen | `spawnHeartWave` |
+| 0 | — | Baby Steps | `updatePlayerPosition` |
+| 1 | 2015 | Single Life | `pushCharacters` |
+| 2 | — | Code in the Dark | `checkHeartCollection` |
+| 3 | Idag | Bröllopet | `spawnHeartWave` |
+
+---
+
+## Teknisk not – Musik
+
+Spelet är en vanlig HTML-sida utan byggverktyg. Enklaste lösningen är en `<audio>`-tagg i `index.html` som startar automatiskt när sidan laddas:
+
+```html
+<audio id="bgMusic" src="assets/music/theme.mp3" loop autoplay></audio>
+```
+
+**Praktiska överväganden:**
+- Webbläsare blockerar autoplay utan användarinteraktion — starta musiken i samband med att någon trycker Enter/Space för att starta spelet, inte vid sidladdning
+- Byt spår eller tempo per rum via JavaScript: `bgMusic.src = "assets/music/room2.mp3"`
+- Alternativ: ha en person med en separat laptop/Spotify som sköter musiken manuellt under showen — enklare och mer kontroll vid ett liveevent
+
+**Musikval per rum (förslag — fyll i faktiska låtar):**
+
+| Rum | Stämning | Förslag |
+|-----|----------|---------|
+| 0 – Baby Steps | Söt, lekfull | [FYLL I] |
+| 1 – Single Life | Göteborg 2015, klubbkänsla | [FYLL I] |
+| 2 – Code in the Dark | Mörk, spänd, dramatisk | [FYLL I] |
+| 3 – Bröllopet | Stor, glad, firande | [FYLL I] |
 
 ---
 
@@ -581,13 +343,7 @@ Grattis.
 
 Fyll i dessa detaljer för att slutföra manuset:
 
-- [ ] Dotterns namn
-- [ ] År för första träffen / första dejten
-- [ ] Kontext om hur de möttes (gemensamma vänner, event, app?)
-- [ ] År för Code in the Dark-eventet och var det hölls
-- [ ] År för inflyttning
-- [ ] År för dotterns ankomst + datum om ni vill dela det
-- [ ] Resmål för semesterrummet + år
-- [ ] Frieriets plats, år och historia
-- [ ] Datum för bröllopet och plats (för sista rummet och avslutningen)
-- [ ] Hur lång tid tog det för Elina att säga ja? (kan vara kul om det var omedelbart)
+- [ ] Vad Elina gör i Rum 1 (Gustav dansar karate-full — vad håller Elina på med?)
+- [ ] Något specifikt om Code in the Dark-kvällen om ni vill dela det
+- [ ] Datum för bröllopet (för Rum 3 intro-skärmen)
+- [ ] Plats för bröllopet (för Rum 3 intro-skärmen)
