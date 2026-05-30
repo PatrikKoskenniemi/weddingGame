@@ -14,7 +14,7 @@ const ROOMS = [
     id: "learn_to_walk",
     map: "assets/maps/learn_to_walk.json",
     year: "2024",
-    title: "Baby steps",
+    title: "Baby Steps",
     door: { col: 14.5, row: 1, w: 2, h: 3 },
     spawn: { col: 6.3, row: 7 },
     hearts: false,
@@ -750,7 +750,7 @@ function drawTimeMachineScreen(targetCtx, elapsed) {
   // Year display
   targetCtx.font = "bold 32px monospace";
   targetCtx.fillStyle = "#ffffff";
-  targetCtx.fillText("1993  →  2015", cx, cy + 20);
+  targetCtx.fillText("2024  →  2015", cx, cy + 20);
 
   // Flashing "press space"
   if (Math.floor(elapsed / 500) % 2 === 0) {
@@ -791,4 +791,158 @@ function drawLevelComplete(targetCtx, roomInfo) {
   targetCtx.fillText("Press space to continue...", cx, cy + 70);
 
   targetCtx.restore();
+}
+
+// --- Pre-Game Screens ---
+
+const INTRO_LINES = [
+  "It's 2024.",
+  "Text TBD",
+  "A baby girl named Annie is born.",
+  "She immediately starts causing problems.",
+  "",
+  "Many years later — on the morning of her parents' wedding —",
+  "she stumbles into a very suspicious wardrobe.",
+  "",
+  "The wardrobe is a time machine.",
+  "",
+  "To get home, she must travel through",
+  "her parents' greatest memories.",
+  "",
+  "Try not to break anything.",
+];
+
+const INTRO_LINE_INTERVAL = 500;
+
+function drawStartScreen(targetCtx, selectedItem, sprites) {
+  const panelCx = CANVAS_WIDTH / 6;
+
+  targetCtx.fillStyle = "#07071a";
+  targetCtx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+  const bgImg = SpriteLoader.get("assets/images/start_screen.png");
+  if (bgImg) {
+    const scale = Math.max(CANVAS_WIDTH / bgImg.naturalWidth, CANVAS_HEIGHT / bgImg.naturalHeight);
+    const dw = bgImg.naturalWidth * scale;
+    const dh = bgImg.naturalHeight * scale;
+    targetCtx.drawImage(bgImg, (CANVAS_WIDTH - dw) / 3, (CANVAS_HEIGHT - dh) / 2, dw, dh);
+  }
+
+  targetCtx.save();
+  targetCtx.textAlign = "center";
+  targetCtx.textBaseline = "middle";
+
+  // Title — two lines to fit the panel width
+  targetCtx.font = "bold 64px monospace";
+  targetCtx.fillStyle = "#f0e040";
+  targetCtx.fillText("CODE IN", panelCx, 160);
+  targetCtx.fillText("THE LIGHT", panelCx, 236);
+
+  targetCtx.font = "22px monospace";
+  targetCtx.fillStyle = "rgba(255,255,255,0.45)";
+  targetCtx.fillText("A Wedding Game", panelCx, 300);
+
+  const items = ["START", "SETTINGS", "QUIT"];
+  const menuY = 400;
+  const lineH = 74;
+
+  for (let i = 0; i < items.length; i++) {
+    const y = menuY + i * lineH;
+    const selected = i === selectedItem;
+    targetCtx.font = `bold ${selected ? 38 : 30}px monospace`;
+    targetCtx.fillStyle = selected ? "#ffffff" : "rgba(255,255,255,0.35)";
+    targetCtx.fillText(selected ? "▶  " + items[i] : items[i], panelCx, y);
+  }
+
+  targetCtx.restore();
+
+  // Characters in front of the church on the right side
+  if (sprites) {
+    const charW = 96;
+    const charH = 192;
+    const smallW = charW * 2 / 3;
+    const smallH = charH * 2 / 3;
+    const charY = 670;
+    const cx = CANVAS_WIDTH / 2;
+    const gap = 100;
+    drawSprite(targetCtx, sprites.gustav, cx - gap, charY, charW,  charH,  "#ff8844");
+    drawSprite(targetCtx, sprites.annie,  cx,        charY, smallW, smallH, "#4488ff");
+    drawSprite(targetCtx, sprites.elina,  cx + gap,  charY, charW,  charH,  "#ff8844");
+  }
+}
+
+function drawIntroScreen(targetCtx, elapsed) {
+  const cx = CANVAS_WIDTH / 2;
+
+  targetCtx.fillStyle = "#000000";
+  targetCtx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+  targetCtx.save();
+  targetCtx.textAlign = "center";
+  targetCtx.textBaseline = "middle";
+
+  const lineH = 46;
+  const startY = CANVAS_HEIGHT / 2 - (INTRO_LINES.length * lineH) / 2;
+
+  for (let i = 0; i < INTRO_LINES.length; i++) {
+    if (i > Math.floor(elapsed / INTRO_LINE_INTERVAL)) break;
+    if (!INTRO_LINES[i]) continue;
+
+    const age = elapsed - i * INTRO_LINE_INTERVAL;
+    targetCtx.globalAlpha = Math.min(1, age / 350);
+    const isLast = i === INTRO_LINES.length - 1;
+    targetCtx.font = isLast ? "bold 30px monospace" : "26px monospace";
+    targetCtx.fillStyle = isLast ? "#f0e040" : "#ffffff";
+    targetCtx.fillText(INTRO_LINES[i], cx, startY + i * lineH);
+  }
+
+  targetCtx.globalAlpha = 1;
+
+  const allShown = Math.floor(elapsed / INTRO_LINE_INTERVAL) >= INTRO_LINES.length - 1;
+  if (allShown && Math.floor(elapsed / 500) % 2 === 0) {
+    targetCtx.font = "22px monospace";
+    targetCtx.fillStyle = "rgba(255,255,255,0.6)";
+    targetCtx.fillText("Press space to begin...", cx, CANVAS_HEIGHT - 60);
+  }
+
+  targetCtx.restore();
+}
+
+function drawSettingsScreen(targetCtx, selectedItem, toggleValue) {
+  const cx = CANVAS_WIDTH / 2;
+  const cy = CANVAS_HEIGHT / 2;
+
+  targetCtx.fillStyle = "#07071a";
+  targetCtx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+  targetCtx.save();
+  targetCtx.textAlign = "center";
+  targetCtx.textBaseline = "middle";
+
+  targetCtx.font = "bold 48px monospace";
+  targetCtx.fillStyle = "#f0e040";
+  targetCtx.fillText("SETTINGS", cx, cy - 130);
+
+  const items = [
+    "♡  EXTRA LOVE:  " + (toggleValue ? "ON" : "OFF"),
+    "BACK",
+  ];
+
+  const menuY = cy + 10;
+  const lineH = 84;
+
+  for (let i = 0; i < items.length; i++) {
+    const y = menuY + i * lineH;
+    const selected = i === selectedItem;
+    targetCtx.font = `bold ${selected ? 38 : 30}px monospace`;
+    targetCtx.fillStyle = selected ? "#ffffff" : "rgba(255,255,255,0.35)";
+    targetCtx.fillText(selected ? "▶  " + items[i] : items[i], cx, y);
+  }
+
+  targetCtx.restore();
+}
+
+function drawQuitScreen(targetCtx) {
+  targetCtx.fillStyle = "#000000";
+  targetCtx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 }

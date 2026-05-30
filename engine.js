@@ -10,10 +10,14 @@ const CANVAS_WIDTH = canvas.width;
 const CANVAS_HEIGHT = canvas.height;
 
 // --- Game State ---
-let gameState = "loading"; // "loading" | "playing" | "dissolving" | "timeMachine" | "levelComplete"
+let gameState = "start"; // "start" | "intro" | "settings" | "quit" | "loading" | "playing" | "dissolving" | "timeMachine" | "levelComplete"
 let timeMachineElapsed = 0;
 let dissolveElapsed = 0;
+let introElapsed = 0;
 const DISSOLVE_DURATION = 2500;
+let selectedMenuItem = 0;
+let selectedSettingsItem = 0;
+let settingsToggle = false;
 let currentRoomIndex = 0;
 
 // Restore room from URL hash (e.g. #room=1) so refresh stays on same room
@@ -35,6 +39,12 @@ const player = {
 };
 
 let score = 0;
+
+const startScreenSprites = {
+  annie:  createSpriteAnimation("player", "idle_down"),
+  gustav: createSpriteAnimation("npc1",   "idle_down"),
+  elina:  createSpriteAnimation("npc2",   "idle_down"),
+};
 
 let hearts = [];
 
@@ -73,10 +83,43 @@ window.addEventListener("keydown", (e) => {
     e.preventDefault();
   }
 
-  // Space dismisses level complete popup or time machine screen
-  if ((gameState === "levelComplete" || gameState === "timeMachine") && e.key === " ") {
-    advanceToNextRoom();
+  if (gameState === "start") {
+    if (e.key === "ArrowUp") {
+      selectedMenuItem = (selectedMenuItem - 1 + 3) % 3;
+    } else if (e.key === "ArrowDown") {
+      selectedMenuItem = (selectedMenuItem + 1) % 3;
+    } else if (e.key === " " || e.key === "Enter") {
+      if (selectedMenuItem === 0) { gameState = "intro"; introElapsed = 0; }
+      else if (selectedMenuItem === 1) { gameState = "settings"; selectedSettingsItem = 0; }
+      else { gameState = "quit"; }
+    }
     e.preventDefault();
+  } else if (gameState === "settings") {
+    if (e.key === "ArrowUp") {
+      selectedSettingsItem = (selectedSettingsItem - 1 + 2) % 2;
+    } else if (e.key === "ArrowDown") {
+      selectedSettingsItem = (selectedSettingsItem + 1) % 2;
+    } else if (e.key === " " || e.key === "Enter") {
+      if (selectedSettingsItem === 0) { settingsToggle = !settingsToggle; }
+      else { gameState = "start"; }
+    }
+    e.preventDefault();
+  } else if (gameState === "intro") {
+    const allShown = Math.floor(introElapsed / INTRO_LINE_INTERVAL) >= INTRO_LINES.length - 1;
+    if (allShown && (e.key === " " || e.key === "Enter")) {
+      loadRoom(0);
+      e.preventDefault();
+    }
+  } else if (gameState === "quit") {
+    if (e.key === " " || e.key === "Enter") {
+      gameState = "start";
+      e.preventDefault();
+    }
+  } else if (gameState === "levelComplete" || gameState === "timeMachine") {
+    if (e.key === " ") {
+      advanceToNextRoom();
+      e.preventDefault();
+    }
   }
 });
 
@@ -293,6 +336,9 @@ function gameLoop(currentTime) {
   }
 
   // Always update visuals (animations run in all states)
+  updateSpriteAnimation(startScreenSprites.annie,  deltaTime);
+  updateSpriteAnimation(startScreenSprites.gustav, deltaTime);
+  updateSpriteAnimation(startScreenSprites.elina,  deltaTime);
   updateAnimatedTiles(deltaTime);
   updatePlayerDirection();
   updateSpriteAnimation(player.sprite, deltaTime);
@@ -303,6 +349,7 @@ function gameLoop(currentTime) {
     updateSpriteAnimation(p.sprite, deltaTime);
   }
 
+  if (gameState === "intro") introElapsed += deltaTime;
   if (gameState === "dissolving") {
     dissolveElapsed += deltaTime;
     if (dissolveElapsed >= DISSOLVE_DURATION) {
@@ -313,7 +360,17 @@ function gameLoop(currentTime) {
   if (gameState === "timeMachine") timeMachineElapsed += deltaTime;
 
   // Draw everything
-  render();
+  if (gameState === "start") {
+    drawStartScreen(ctx, selectedMenuItem, startScreenSprites);
+  } else if (gameState === "intro") {
+    drawIntroScreen(ctx, introElapsed);
+  } else if (gameState === "settings") {
+    drawSettingsScreen(ctx, selectedSettingsItem, settingsToggle);
+  } else if (gameState === "quit") {
+    drawQuitScreen(ctx);
+  } else {
+    render();
+  }
 
   requestAnimationFrame(gameLoop);
 }
@@ -323,8 +380,11 @@ function gameLoop(currentTime) {
 const allLoads = [
   SpriteLoader.preloadAll(SPRITE_SHEETS),
   SpriteLoader.load("assets/images/time_spiral.webp"),
+  SpriteLoader.load("assets/images/start_screen.png"),
 ];
 Promise.allSettled(allLoads).then(async () => {
-  await loadRoom(currentRoomIndex);
+  if (hashMatch) {
+    await loadRoom(currentRoomIndex);
+  }
   requestAnimationFrame(gameLoop);
 });
