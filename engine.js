@@ -326,6 +326,7 @@ function gameLoop(currentTime) {
         gameState = "dissolving";
         dissolveElapsed = 0;
         initDissolve();
+        SoundSystem.play("timeMachine");
       } else {
         gameState = "levelComplete";
       }
@@ -355,6 +356,7 @@ function gameLoop(currentTime) {
     if (dissolveElapsed >= DISSOLVE_DURATION) {
       gameState = "timeMachine";
       timeMachineElapsed = 0;
+      SoundSystem.play("timeMachineScreen");
     }
   }
   if (gameState === "timeMachine") timeMachineElapsed += deltaTime;
@@ -377,10 +379,16 @@ function gameLoop(currentTime) {
 
 // --- Start ---
 // Preload sprite sheets + tileset images, then load first room and start
+const SOUNDS = {
+  timeMachine: "assets/sounds/floraphonic-classic-game-action-negative-3-224421.mp3",
+  timeMachineScreen: "assets/sounds/rescopicsound-cinematic-designed-sci-fi-whoosh-transition-nexawave-228295.mp3",
+};
+
 const allLoads = [
   SpriteLoader.preloadAll(SPRITE_SHEETS),
   SpriteLoader.load("assets/images/time_spiral.webp"),
   SpriteLoader.load("assets/images/start_screen.png"),
+  SoundSystem.preloadAll(SOUNDS),
 ];
 Promise.allSettled(allLoads).then(async () => {
   if (hashMatch) {
