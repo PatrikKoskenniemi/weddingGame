@@ -15,7 +15,7 @@ const ROOMS = [
     map: "assets/maps/learn_to_walk.json",
     year: "2024",
     title: "Baby Steps",
-    door: { col: 14.5, row: 1, w: 2, h: 3 },
+    door: { col: 14.0, row: 1, w: 2, h: 3 },
     spawn: { col: 6.3, row: 7 },
     hearts: false,
   },
@@ -35,6 +35,16 @@ const ROOMS = [
       { col: 9, row: 6.2 },
       { col: 9, row: 10.1},
     ],
+    popover: {
+      title: "Stockholm, 2015",
+      lines: [
+        "Gustav and Elina are both single.",
+        "Neither of them has a clue.",
+        "",
+        "Push them together.",
+        "It worked in real life too.",
+      ],
+    },
   },
   {
     id: "coding_in_the_dark",
@@ -743,9 +753,9 @@ function drawTimeMachineScreen(targetCtx, elapsed) {
 
   targetCtx.font = "bold 52px monospace";
   targetCtx.fillStyle = "rgba(0,0,0,0.5)";
-  targetCtx.fillText("TRAVELLING THROUGH TIME...", cx + 3, cy - 40 + 3);
+  targetCtx.fillText("RESER I TIDEN...", cx + 3, cy - 40 + 3);
   targetCtx.fillStyle = "#f0e040";
-  targetCtx.fillText("TRAVELLING THROUGH TIME...", cx, cy - 40);
+  targetCtx.fillText("RESER I TIDEN...", cx, cy - 40);
 
   // Year display
   targetCtx.font = "bold 32px monospace";
@@ -756,7 +766,7 @@ function drawTimeMachineScreen(targetCtx, elapsed) {
   if (Math.floor(elapsed / 500) % 2 === 0) {
     targetCtx.font = "22px monospace";
     targetCtx.fillStyle = "rgba(255,255,255,0.7)";
-    targetCtx.fillText("Press space to continue...", cx, cy + 80);
+    targetCtx.fillText("Press space to continue...", cx, cy + 185);
   }
 
   targetCtx.restore();
@@ -945,4 +955,50 @@ function drawSettingsScreen(targetCtx, selectedItem, toggleValue) {
 function drawQuitScreen(targetCtx) {
   targetCtx.fillStyle = "#000000";
   targetCtx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+}
+
+function drawRoomPopover(targetCtx, popover) {
+  const cx = CANVAS_WIDTH / 2;
+  const cy = CANVAS_HEIGHT / 2;
+
+  targetCtx.fillStyle = "rgba(0, 0, 0, 0.72)";
+  targetCtx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+  const panelW = 680;
+  const panelH = 320;
+  const px = cx - panelW / 2;
+  const py = cy - panelH / 2;
+
+  targetCtx.fillStyle = "#0d0d2b";
+  targetCtx.strokeStyle = "#f0e040";
+  targetCtx.lineWidth = 3;
+  targetCtx.beginPath();
+  targetCtx.roundRect(px, py, panelW, panelH, 12);
+  targetCtx.fill();
+  targetCtx.stroke();
+
+  targetCtx.save();
+  targetCtx.textAlign = "center";
+  targetCtx.textBaseline = "middle";
+
+  targetCtx.font = "bold 36px monospace";
+  targetCtx.fillStyle = "#f0e040";
+  targetCtx.fillText(popover.title, cx, py + 52);
+
+  const lineH = 34;
+  const textStartY = py + 110;
+  for (let i = 0; i < popover.lines.length; i++) {
+    if (!popover.lines[i]) continue;
+    targetCtx.font = "24px monospace";
+    targetCtx.fillStyle = "#ffffff";
+    targetCtx.fillText(popover.lines[i], cx, textStartY + i * lineH);
+  }
+
+  if (Math.floor(performance.now() / 500) % 2 === 0) {
+    targetCtx.font = "20px monospace";
+    targetCtx.fillStyle = "rgba(255,255,255,0.6)";
+    targetCtx.fillText("Press space to continue...", cx, py + panelH - 30);
+  }
+
+  targetCtx.restore();
 }

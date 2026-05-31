@@ -51,6 +51,9 @@ let hearts = [];
 let pushables = [];
 let roomDoorUnlocked = false;
 let codingDarkUnlocked = false;
+let roomPopoverActive = false;
+let dissolveSoundSource = null;
+let timeMachineSoundSource = null;
 
 function spawnHearts(count) {
   const margin = 40;
@@ -115,6 +118,11 @@ window.addEventListener("keydown", (e) => {
       gameState = "start";
       e.preventDefault();
     }
+  } else if (gameState === "playing" && roomPopoverActive) {
+    if (e.key === " " || e.key === "Enter") {
+      roomPopoverActive = false;
+      e.preventDefault();
+    }
   } else if (gameState === "levelComplete" || gameState === "timeMachine") {
     if (e.key === " ") {
       advanceToNextRoom();
@@ -133,7 +141,7 @@ window.addEventListener("keyup", (e) => {
 // --- Door Detection ---
 function checkDoorCollision() {
   const room = ROOMS[currentRoomIndex];
-  if (!room || !room.door) return false;
+  if (!room?.door) return false;
 
   const door = doorToCanvas(room.door);
   return (
@@ -149,6 +157,12 @@ async function loadRoom(roomIndex) {
   gameState = "loading";
   currentRoomIndex = roomIndex;
   location.hash = "room=" + roomIndex;
+  roomBackgroundBelow = null;
+  roomBackgroundAbove = null;
+  try { dissolveSoundSource?.stop(); } catch (_) {}
+  try { timeMachineSoundSource?.stop(); } catch (_) {}
+  dissolveSoundSource = null;
+  timeMachineSoundSource = null;
 
   const room = ROOMS[roomIndex];
   const mapData = await loadMap(room.map);
@@ -166,6 +180,7 @@ async function loadRoom(roomIndex) {
   // Reset hearts for new room
   hearts = [];
   codingDarkUnlocked = false;
+  roomPopoverActive = !!room.popover;
   if (room.hearts) spawnHearts(8);
 
   // Spawn pushable characters from room config
@@ -273,6 +288,9 @@ function render() {
     drawDissolveOverlay(ctx, dissolveElapsed / DISSOLVE_DURATION, dissolveElapsed);
   }
 
+  if (roomPopoverActive && ROOMS[currentRoomIndex].popover) {
+    drawRoomPopover(ctx, ROOMS[currentRoomIndex].popover);
+  }
   if (gameState === "levelComplete") {
     drawLevelComplete(ctx, ROOMS[currentRoomIndex]);
   }
@@ -295,7 +313,7 @@ function gameLoop(currentTime) {
   const deltaTime = currentTime - lastTime;
   lastTime = currentTime;
 
-  if (gameState === "playing") {
+  if (gameState === "playing" && !roomPopoverActive) {
     // Update logic (calls functions from gameLogic.js)
     updatePlayerPosition(player, keysPressed);
     score += checkHeartCollection(player, hearts);
@@ -326,7 +344,7 @@ function gameLoop(currentTime) {
         gameState = "dissolving";
         dissolveElapsed = 0;
         initDissolve();
-        SoundSystem.play("timeMachine");
+        dissolveSoundSource = SoundSystem.play("timeMachine", { loop: true });
       } else {
         gameState = "levelComplete";
       }
@@ -356,7 +374,9 @@ function gameLoop(currentTime) {
     if (dissolveElapsed >= DISSOLVE_DURATION) {
       gameState = "timeMachine";
       timeMachineElapsed = 0;
-      SoundSystem.play("timeMachineScreen");
+      try { dissolveSoundSource?.stop(); } catch (_) {}
+      dissolveSoundSource = null;
+      timeMachineSoundSource = SoundSystem.play("timeMachineScreen", { loop: true });
     }
   }
   if (gameState === "timeMachine") timeMachineElapsed += deltaTime;

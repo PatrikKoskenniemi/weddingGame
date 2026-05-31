@@ -56,7 +56,7 @@ Tryck Enter för att börja
 
 ## RUM 0 – Baby Steps
 
-> **MUSIKNOT:** Musik startar här när spelet laddas. Se teknisk not om musik längst ner.
+> **MUSIKNOT:** Musik spelas på separat tab/Spotify — inte inbyggt i spelet.
 
 **SKÄRM (intro, visas före rummet laddas):**
 ```
@@ -312,30 +312,6 @@ Grattis.
 | 1 | 2015 | Single Life | `pushCharacters` |
 | 2 | — | Code in the Dark | `checkHeartCollection` |
 | 3 | Idag | Bröllopet | `spawnHeartWave` |
-
----
-
-## Teknisk not – Musik
-
-Spelet är en vanlig HTML-sida utan byggverktyg. Enklaste lösningen är en `<audio>`-tagg i `index.html` som startar automatiskt när sidan laddas:
-
-```html
-<audio id="bgMusic" src="assets/music/theme.mp3" loop autoplay></audio>
-```
-
-**Praktiska överväganden:**
-- Webbläsare blockerar autoplay utan användarinteraktion — starta musiken i samband med att någon trycker Enter/Space för att starta spelet, inte vid sidladdning
-- Byt spår eller tempo per rum via JavaScript: `bgMusic.src = "assets/music/room2.mp3"`
-- Alternativ: ha en person med en separat laptop/Spotify som sköter musiken manuellt under showen — enklare och mer kontroll vid ett liveevent
-
-**Musikval per rum (förslag — fyll i faktiska låtar):**
-
-| Rum | Stämning | Förslag |
-|-----|----------|---------|
-| 0 – Baby Steps | Söt, lekfull | [FYLL I] |
-| 1 – Single Life | Göteborg 2015, klubbkänsla | [FYLL I] |
-| 2 – Code in the Dark | Mörk, spänd, dramatisk | [FYLL I] |
-| 3 – Bröllopet | Stor, glad, firande | [FYLL I] |
 
 ---
 

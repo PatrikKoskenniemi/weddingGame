@@ -6,18 +6,18 @@
 function updatePlayerPosition(player, keysPressed) {
   let dx = 0;
   let dy = 0;
-
+  const speed = 5
   if(keysPressed.ArrowUp){
-    player.y = player.y-2
+    player.y = player.y-speed
   }
     if(keysPressed.ArrowDown){
-    player.y = player.y+2
+    player.y = player.y+speed
   }
       if(keysPressed.ArrowLeft){
-    player.x = player.x-2
+    player.x = player.x-speed
   }
       if(keysPressed.ArrowRight){
-    player.x = player.x+2
+    player.x = player.x+speed
   }
 
 }
