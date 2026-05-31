@@ -504,6 +504,18 @@ function drawRoomForeground() {
   }
 }
 
+// --- Pustervik Sign ---
+
+function drawPustervikSign(targetCtx) {
+  const img = SpriteLoader.get("assets/images/pustervik_sign.png");
+  if (!img) return;
+  const w = 3 * T * S;
+  const h = Math.round(w * img.naturalHeight / img.naturalWidth);
+  const x = ROOM_BOUNDS.x + 3 * T * S;
+  const y = ROOM_BOUNDS.y - 40 + Math.round((ROOM_BOUNDS.wallHeight - h) / 2);
+  targetCtx.drawImage(img, x, y, w, h);
+}
+
 // --- Disco Overlay ---
 
 function drawDiscoOverlay(targetCtx) {
@@ -806,20 +818,21 @@ function drawLevelComplete(targetCtx, roomInfo) {
 // --- Pre-Game Screens ---
 
 const INTRO_LINES = [
-  "It's 2024.",
-  "Text TBD",
-  "A baby girl named Annie is born.",
-  "She immediately starts causing problems.",
+  "Året är 2024.",
   "",
-  "Many years later — on the morning of her parents' wedding —",
-  "she stumbles into a very suspicious wardrobe.",
+  "En liten flicka vid namnet Annie tar sina första stapplande steg.",
+  "Hon vaggar fram mot morfars mystiska garderob.",
   "",
-  "The wardrobe is a time machine.",
+  "För varje steg hon tar blir ett klickande ljud från garderoben tydligare.",
   "",
-  "To get home, she must travel through",
-  "her parents' greatest memories.",
+  "Annie lyckas öppna den gläntande dörren och kliver in.",
   "",
-  "Try not to break anything.",
+  "Det är en tidsmaskin!",
+  "",
+  "För att säkra sin egen framtid måste hon hjälpa",
+  "sina föräldrar att träffa varandra!",
+  "",
+  "Hur ska detta gå??",
 ];
 
 const INTRO_LINE_INTERVAL = 500;

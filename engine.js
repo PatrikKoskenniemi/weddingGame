@@ -279,6 +279,7 @@ function render() {
   }
   if (ROOMS[currentRoomIndex].id === "single_life") {
     drawDiscoOverlay(ctx);
+    drawPustervikSign(ctx);
   }
   if (ROOMS[currentRoomIndex].showTitle !== false) drawRoomTitle(ctx);
   drawScore();
@@ -344,7 +345,7 @@ function gameLoop(currentTime) {
         gameState = "dissolving";
         dissolveElapsed = 0;
         initDissolve();
-        dissolveSoundSource = SoundSystem.play("timeMachine", { loop: true });
+        dissolveSoundSource = SoundSystem.play("negativeAction");
       } else {
         gameState = "levelComplete";
       }
@@ -400,7 +401,7 @@ function gameLoop(currentTime) {
 // --- Start ---
 // Preload sprite sheets + tileset images, then load first room and start
 const SOUNDS = {
-  timeMachine: "assets/sounds/floraphonic-classic-game-action-negative-3-224421.mp3",
+  negativeAction: "assets/sounds/floraphonic-classic-game-action-negative-3-224421.mp3",
   timeMachineScreen: "assets/sounds/rescopicsound-cinematic-designed-sci-fi-whoosh-transition-nexawave-228295.mp3",
 };
 
@@ -408,6 +409,7 @@ const allLoads = [
   SpriteLoader.preloadAll(SPRITE_SHEETS),
   SpriteLoader.load("assets/images/time_spiral.webp"),
   SpriteLoader.load("assets/images/start_screen.png"),
+  SpriteLoader.load("assets/images/pustervik_sign.png"),
   SoundSystem.preloadAll(SOUNDS),
 ];
 Promise.allSettled(allLoads).then(async () => {
