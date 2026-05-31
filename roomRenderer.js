@@ -489,7 +489,7 @@ function drawTargetMarkers(targetCtx, targets) {
     const y = ROOM_BOUNDS.y + (t.row + 0.5) * T * S;
     const r = T * S * 0.4;
     targetCtx.save();
-    targetCtx.strokeStyle = "#ffffff";
+    targetCtx.strokeStyle = "rgba(255,255,255,0.5)";
     targetCtx.lineWidth = 3;
     targetCtx.setLineDash([6, 4]);
     targetCtx.beginPath();
@@ -528,7 +528,7 @@ function drawPustervikSign(targetCtx) {
 
 // --- Disco Overlay ---
 
-function drawDiscoOverlay(targetCtx) {
+function drawDiscoOverlay(targetCtx, litSpots = []) {
   const t = performance.now();
   const w = CANVAS_WIDTH;
   const h = CANVAS_HEIGHT;
@@ -580,6 +580,18 @@ function drawDiscoOverlay(targetCtx) {
     oc.arc(x, y, r, 0, Math.PI * 2);
     oc.fill();
    }
+  }
+
+  for (const spot of litSpots) {
+    const r = 80;
+    const grad = oc.createRadialGradient(spot.x, spot.y, 0, spot.x, spot.y, r);
+    grad.addColorStop(0,   "rgba(255,255,255,1)");
+    grad.addColorStop(0.6, "rgba(255,255,255,0.8)");
+    grad.addColorStop(1,   "rgba(255,255,255,0)");
+    oc.fillStyle = grad;
+    oc.beginPath();
+    oc.arc(spot.x, spot.y, r, 0, Math.PI * 2);
+    oc.fill();
   }
 
   targetCtx.drawImage(offscreen, 0, 0);

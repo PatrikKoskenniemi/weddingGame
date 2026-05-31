@@ -241,11 +241,15 @@ function drawHearts() {
 }
 
 function drawPushables() {
-  const room = ROOMS[currentRoomIndex];
-  if (room.targets) drawTargetMarkers(ctx, room.targets);
   for (const p of pushables) {
     drawSprite(ctx, p.sprite, p.x, p.y, p.size, p.size * 2, "#ff8844");
   }
+}
+
+function drawTargetMarkersOverlay() {
+  const room = ROOMS[currentRoomIndex];
+  if (!room.targets || pushables.length === 0) return;
+  drawTargetMarkers(ctx, room.targets);
 }
 
 function drawScore() {
@@ -272,13 +276,21 @@ function render() {
   drawAnimatedTiles(ctx);
   drawRoomForeground();
   drawHearts();
+  drawTargetMarkersOverlay();
   drawPushables();
   drawPlayer();
   if (ROOMS[currentRoomIndex].id === "coding_in_the_dark") {
     drawSpotlightOverlay(ctx, player, codingDarkUnlocked);
   }
   if (ROOMS[currentRoomIndex].id === "single_life") {
-    drawDiscoOverlay(ctx);
+    const room = ROOMS[currentRoomIndex];
+    const litSpots = room.targets
+      ? pushables
+          .map((p, i) => ({ p, t: spawnToCanvas(room.targets[i]) }))
+          .filter(({ p, t }) => Math.abs(p.x - t.x) < 55 && Math.abs(p.y - t.y) < 55)
+          .map(({ t }) => t)
+      : [];
+    drawDiscoOverlay(ctx, litSpots);
     drawPustervikSign(ctx);
   }
   if (ROOMS[currentRoomIndex].showTitle !== false) drawRoomTitle(ctx);
@@ -334,7 +346,7 @@ function gameLoop(currentTime) {
       const room = ROOMS[currentRoomIndex];
       roomDoorUnlocked = pushables.every((p, i) => {
         const t = spawnToCanvas(room.targets[i]);
-        return Math.abs(p.x - t.x) < 35 && Math.abs(p.y - t.y) < 35;
+        return Math.abs(p.x - t.x) < 55 && Math.abs(p.y - t.y) < 55;
       });
     }
 

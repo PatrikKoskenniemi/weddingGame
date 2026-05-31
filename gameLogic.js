@@ -23,9 +23,39 @@ function updatePlayerPosition(player, keysPressed) {
 }
 
 function pushCharacters(player, characters) {
-    // TODO: Loop over characters
-    // TODO: Calculate dx/dy between player and character
-    // TODO: If close enough, push the character away from the player
+  const playerR = player.size / 2;
+
+  for (const c of characters) {
+    const r = c.size / 2;
+    const dx = c.x - player.x;
+    const dy = c.y - player.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    const minDist = playerR + r;
+    if (dist < minDist && dist > 0) {
+      const overlap = minDist - dist;
+      c.x += (dx / dist) * overlap;
+      c.y += (dy / dist) * overlap;
+    }
+  }
+
+  // Prevent the two characters from overlapping each other
+  for (let i = 0; i < characters.length; i++) {
+    for (let j = i + 1; j < characters.length; j++) {
+      const a = characters[i];
+      const b = characters[j];
+      const dx = b.x - a.x;
+      const dy = b.y - a.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      const minDist = a.size / 2 + b.size / 2;
+      if (dist < minDist && dist > 0) {
+        const overlap = (minDist - dist) / 2;
+        a.x -= (dx / dist) * overlap;
+        a.y -= (dy / dist) * overlap;
+        b.x += (dx / dist) * overlap;
+        b.y += (dy / dist) * overlap;
+      }
+    }
+  }
 }
 
 function checkHeartCollection(player, hearts) {
