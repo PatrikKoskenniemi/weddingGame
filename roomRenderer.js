@@ -39,17 +39,20 @@ const ROOMS = [
       title: "På lokal",
       lines: [
         "Annie har landat i 2015.",
-        "Eran när alla ville jobba på Liseberg ",
-        "och det fanns pingisbord på nattklubbarna",
+        "En tid av pingisbord, sommarjobb på Liseberg",
+        "och alldeles för många #TBT Instagram-poster",
         "",
-        "Gustav är karate-full och har helt tappat",
-        "bort sig i någon fuldans på dansgolvet.",
+        "På dansgolvet: Gustav",
+        "Troligtvis karate-full.",
+        "Definitivt inte medveten om vart han är",
         "",
-        "I motsatt hörn står Elina,",
-        "hon postar sin 43:e bild för sommaren på Instagram",
+        "Vid baren: Elina.",
+        "Postar sin tredje bild från Way Out West för dagen.",
         "",
-        "Om Annie bara kunde föra ihop dom...",
-        "En pingismatch måste måste göra tricket!",
+        "Dom vet inte om varandra ännu.",
+        "Det måste Annie fixa.",
+        "",
+        "Putta Gustav och Elina till pingisbordet.",
       ],
     },
   },
@@ -989,7 +992,7 @@ function drawRoomPopover(targetCtx, popover) {
   targetCtx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
   const panelW = 780;
-  const panelH = 570;
+  const panelH = 650;
   const px = cx - panelW / 2;
   const py = cy - panelH / 2;
 
@@ -1011,10 +1014,12 @@ function drawRoomPopover(targetCtx, popover) {
 
   const lineH = 34;
   const textStartY = py + 110;
+  const lastIdx = popover.lines.reduce((last, l, i) => l ? i : last, -1);
   for (let i = 0; i < popover.lines.length; i++) {
     if (!popover.lines[i]) continue;
-    targetCtx.font = "24px monospace";
-    targetCtx.fillStyle = "#ffffff";
+    const isLast = i === lastIdx;
+    targetCtx.font = isLast ? "italic 24px monospace" : "24px monospace";
+    targetCtx.fillStyle = isLast ? "#f0e040" : "#ffffff";
     targetCtx.fillText(popover.lines[i], cx, textStartY + i * lineH);
   }
 
