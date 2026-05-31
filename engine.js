@@ -110,7 +110,7 @@ window.addEventListener("keydown", (e) => {
   } else if (gameState === "intro") {
     const allShown = Math.floor(introElapsed / INTRO_LINE_INTERVAL) >= INTRO_LINES.length - 1;
     if (allShown && (e.key === " " || e.key === "Enter")) {
-      loadRoom(0);
+      loadRoom(0, true);
       e.preventDefault();
     }
   } else if (gameState === "quit") {
@@ -153,7 +153,7 @@ function checkDoorCollision() {
 }
 
 // --- Room Loading ---
-async function loadRoom(roomIndex) {
+async function loadRoom(roomIndex, showPopover = false) {
   gameState = "loading";
   currentRoomIndex = roomIndex;
   location.hash = "room=" + roomIndex;
@@ -180,7 +180,7 @@ async function loadRoom(roomIndex) {
   // Reset hearts for new room
   hearts = [];
   codingDarkUnlocked = false;
-  roomPopoverActive = !!room.popover;
+  roomPopoverActive = showPopover && !!room.popover;
   if (room.hearts) spawnHearts(8);
 
   // Spawn pushable characters from room config
@@ -201,7 +201,7 @@ async function loadRoom(roomIndex) {
 function advanceToNextRoom() {
   const nextIndex = currentRoomIndex + 1;
   if (nextIndex < ROOMS.length) {
-    loadRoom(nextIndex);
+    loadRoom(nextIndex, true);
   } else {
     // Last room — stay on level complete screen
     gameState = "levelComplete";
