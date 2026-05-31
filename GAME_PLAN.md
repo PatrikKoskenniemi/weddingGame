@@ -84,7 +84,7 @@ Between each room, a story text is shown to narrate Annie's time-travel mission 
 
 ---
 
-### Room 2 – Single Life
+### Room 2 – På Lokal
 **Life stage:** 2015 — Göteborg. Annie lands here by accident.
 **Narrative:** Annie arrives in 2015 Göteborg, the era of ping pong tables in nightclubs and Theo Berndt still going by "The Berndt". Gustav is on the dance floor, karate-full, doing something embarrassing. Elina is [FYLL I: vad Elina gör]. Annie has to bring them together somehow.
 **Objective:** Push/guide Gustav and Elina toward each other (or to a meeting point)
@@ -208,7 +208,7 @@ Possible ideas:
 | # | Room | Life Stage | Function | Status |
 |---|------|-----------|----------|--------|
 | 1 | Baby Steps | Baby | `updatePlayerPosition` | ✅ |
-| 2 | Single Life | Young adult | `checkObstacleCollision` | ✅ |
+| 2 | På Lokal | Young adult | `checkObstacleCollision` | ✅ |
 | 3 | First Date | Meeting | TBD | ⚠️ |
 | 4 | Code in the Dark | Reunion | TBD | ⚠️ |
 | 5 | Moving In Together | First apartment | `checkPlacement` | ✅ |

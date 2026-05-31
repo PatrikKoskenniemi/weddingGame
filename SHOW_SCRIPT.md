@@ -118,7 +118,7 @@ Annie har landat i...
 
 ---
 
-## RUM 2 – 2015: Single Life
+## RUM 2 – 2015: På Lokal
 
 **SKÄRM (intro):**
 ```
@@ -153,7 +153,7 @@ men hur??
 **SKÄRM (Level Complete):**
 ```
 Level Complete!
-2015 — Single Life
+2015 — På Lokal
 
 Dom hamnade på samma ställe.
 Det fick räcka.
@@ -309,7 +309,7 @@ Grattis.
 | Rum | År | Titel | Funktion(er) att koda |
 |-----|-----|-------|------------------------|
 | 0 | — | Baby Steps | `updatePlayerPosition` |
-| 1 | 2015 | Single Life | `pushCharacters` |
+| 1 | 2015 | På Lokal | `pushCharacters` |
 | 2 | — | Code in the Dark | `checkHeartCollection` |
 | 3 | Idag | Bröllopet | `spawnHeartWave` |
 

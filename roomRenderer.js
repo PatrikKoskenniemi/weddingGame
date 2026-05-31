@@ -23,7 +23,7 @@ const ROOMS = [
     id: "single_life",
     map: "assets/maps/single_life.json",
     year: "2015",
-    title: "Single Life",
+    title: "På Lokal",
     door: { col: 15, row: 2, w: 2, h: 3 },
     spawn: { col: 6, row: 9 },
     hearts: false,
@@ -36,13 +36,20 @@ const ROOMS = [
       { col: 9, row: 10.1},
     ],
     popover: {
-      title: "Stockholm, 2015",
+      title: "På lokal",
       lines: [
-        "Gustav and Elina are both single.",
-        "Neither of them has a clue.",
+        "Annie har landat i 2015.",
+        "Eran när alla ville jobba på Liseberg ",
+        "och det fanns pingisbord på nattklubbarna",
         "",
-        "Push them together.",
-        "It worked in real life too.",
+        "Gustav är karate-full och har helt tappat",
+        "bort sig i någon fuldans på dansgolvet.",
+        "",
+        "I motsatt hörn står Elina,",
+        "hon postar sin 43:e bild för sommaren på Instagram",
+        "",
+        "Om Annie bara kunde föra ihop dom...",
+        "En pingismatch måste måste göra tricket!",
       ],
     },
   },
@@ -765,9 +772,9 @@ function drawTimeMachineScreen(targetCtx, elapsed) {
 
   targetCtx.font = "bold 52px monospace";
   targetCtx.fillStyle = "rgba(0,0,0,0.5)";
-  targetCtx.fillText("RESER I TIDEN...", cx + 3, cy - 40 + 3);
+  targetCtx.fillText("RESER TILLBAKA I TIDEN...", cx + 3, cy - 40 + 3);
   targetCtx.fillStyle = "#f0e040";
-  targetCtx.fillText("RESER I TIDEN...", cx, cy - 40);
+  targetCtx.fillText("RESER TILLBAKA I TIDEN...", cx, cy - 40);
 
   // Year display
   targetCtx.font = "bold 32px monospace";
@@ -778,7 +785,7 @@ function drawTimeMachineScreen(targetCtx, elapsed) {
   if (Math.floor(elapsed / 500) % 2 === 0) {
     targetCtx.font = "22px monospace";
     targetCtx.fillStyle = "rgba(255,255,255,0.7)";
-    targetCtx.fillText("Press space to continue...", cx, cy + 185);
+    targetCtx.fillText("Press space to continue...", cx, CANVAS_HEIGHT - 60);
   }
 
   targetCtx.restore();
@@ -820,19 +827,23 @@ function drawLevelComplete(targetCtx, roomInfo) {
 const INTRO_LINES = [
   "Året är 2024.",
   "",
-  "En liten flicka vid namnet Annie tar sina första stapplande steg.",
-  "Hon vaggar fram mot morfars mystiska garderob.",
+  "Annie tar sina första stapplande steg i sitt rum.",
   "",
-  "För varje steg hon tar blir ett klickande ljud från garderoben tydligare.",
+  "I hörnet står en gammal garderob, ett arv från morfar.",
+  "Den klickar och surrar på ett konstigt sätt.",
   "",
-  "Annie lyckas öppna den gläntande dörren och kliver in.",
+  "Annie är nyfiken. Annie är modig.",
+  "Annie öppnar dörren.",
   "",
-  "Det är en tidsmaskin!",
+  "Det var ett misstag.",
   "",
-  "För att säkra sin egen framtid måste hon hjälpa",
-  "sina föräldrar att träffa varandra!",
+  "Nu sitter hon fast i det förflutna, ",
+  "och hennes föräldrar har inte ens träffats ännu.",
   "",
-  "Hur ska detta gå??",
+  "Om hon inte fixar det...",
+  "finns hon inte.",
+  "",
+  "En stor uppgift för en liten tjej",
 ];
 
 const INTRO_LINE_INTERVAL = 500;
@@ -904,8 +915,8 @@ function drawIntroScreen(targetCtx, elapsed) {
   targetCtx.textAlign = "center";
   targetCtx.textBaseline = "middle";
 
-  const lineH = 46;
-  const startY = CANVAS_HEIGHT / 2 - (INTRO_LINES.length * lineH) / 2;
+  const lineH = 38;
+  const startY = lineH;
 
   for (let i = 0; i < INTRO_LINES.length; i++) {
     if (i > Math.floor(elapsed / INTRO_LINE_INTERVAL)) break;
@@ -925,7 +936,7 @@ function drawIntroScreen(targetCtx, elapsed) {
   if (allShown && Math.floor(elapsed / 500) % 2 === 0) {
     targetCtx.font = "22px monospace";
     targetCtx.fillStyle = "rgba(255,255,255,0.6)";
-    targetCtx.fillText("Press space to begin...", cx, CANVAS_HEIGHT - 60);
+    targetCtx.fillText("Press space to begin...", cx, CANVAS_HEIGHT - 18);
   }
 
   targetCtx.restore();
@@ -977,8 +988,8 @@ function drawRoomPopover(targetCtx, popover) {
   targetCtx.fillStyle = "rgba(0, 0, 0, 0.72)";
   targetCtx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-  const panelW = 680;
-  const panelH = 320;
+  const panelW = 780;
+  const panelH = 570;
   const px = cx - panelW / 2;
   const py = cy - panelH / 2;
 
