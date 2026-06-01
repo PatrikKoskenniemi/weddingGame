@@ -57,6 +57,7 @@ let trapdoor = null;
 let emergencyExit = null;
 let emergencyExitTimeout = null;
 let dissolveSoundSource = null;
+let startScreenSoundSource = null;
 let timeMachineSoundSource = null;
 
 function spawnHearts(count) {
@@ -90,15 +91,29 @@ window.addEventListener("keydown", (e) => {
     e.preventDefault();
   }
 
+  if (gameState === "start" || gameState === "settings") {
+    if (!startScreenSoundSource) {
+      startScreenSoundSource = SoundSystem.play("startScreen", { loop: true });
+    }
+  }
+
   if (gameState === "start") {
     if (e.key === "ArrowUp") {
       selectedMenuItem = (selectedMenuItem - 1 + 3) % 3;
     } else if (e.key === "ArrowDown") {
       selectedMenuItem = (selectedMenuItem + 1) % 3;
     } else if (e.key === " " || e.key === "Enter") {
-      if (selectedMenuItem === 0) { gameState = "intro"; introElapsed = 0; }
-      else if (selectedMenuItem === 1) { gameState = "settings"; selectedSettingsItem = 0; }
-      else { gameState = "quit"; }
+      if (selectedMenuItem === 0) {
+        try { startScreenSoundSource?.stop(); } catch (_) {}
+        startScreenSoundSource = null;
+        gameState = "intro"; introElapsed = 0;
+      } else if (selectedMenuItem === 1) {
+        gameState = "settings"; selectedSettingsItem = 0;
+      } else {
+        try { startScreenSoundSource?.stop(); } catch (_) {}
+        startScreenSoundSource = null;
+        gameState = "quit";
+      }
     }
     e.preventDefault();
   } else if (gameState === "settings") {
@@ -455,6 +470,7 @@ function gameLoop(currentTime) {
 const SOUNDS = {
   negativeAction: "assets/sounds/floraphonic-classic-game-action-negative-3-224421.mp3",
   timeMachineScreen: "assets/sounds/rescopicsound-cinematic-designed-sci-fi-whoosh-transition-nexawave-228295.mp3",
+  startScreen: "assets/sounds/Sprite_spark.mp3",
 };
 
 const allLoads = [
@@ -468,6 +484,8 @@ const allLoads = [
 Promise.allSettled(allLoads).then(async () => {
   if (hashMatch) {
     await loadRoom(currentRoomIndex);
+  } else {
+    startScreenSoundSource = SoundSystem.play("startScreen", { loop: true });
   }
   requestAnimationFrame(gameLoop);
 });
