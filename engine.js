@@ -54,6 +54,7 @@ let codingDarkUnlocked = false;
 let trapdoorAboveOverlay = false;
 let roomPopoverActive = false;
 let trapdoor = null;
+let emergencyExit = null;
 let dissolveSoundSource = null;
 let timeMachineSoundSource = null;
 
@@ -187,6 +188,9 @@ async function loadRoom(roomIndex, showPopover = false) {
   trapdoor = room.id === "coding_in_the_dark"
     ? { sprite: createSpriteAnimation("trapdoor", "closed"), ...spawnToCanvas({ col: 13.5, row: 10 }) }
     : null;
+  emergencyExit = room.id === "single_life"
+    ? { sprite: createSpriteAnimation("emergencyExit", "closed"), ...spawnToCanvas({ col: 8.6, row: 2.15 }) }
+    : null;
   if (room.hearts) spawnHearts(8);
 
   // Spawn pushable characters from room config
@@ -281,6 +285,13 @@ function render() {
   drawBackground();
   drawAnimatedTiles(ctx);
   drawRoomForeground();
+  if (emergencyExit) {
+    if (roomDoorUnlocked) {
+      ctx.fillStyle = "#000000";
+      ctx.fillRect(emergencyExit.x - T * S / 2, emergencyExit.y - T * S + 55, T * S, T * S * 3/2);
+    }
+    drawSprite(ctx, emergencyExit.sprite, emergencyExit.x, emergencyExit.y, T * S, T * S * 3, "#00aa00");
+  }
   drawHearts();
   drawTargetMarkersOverlay();
   drawPushables();
@@ -362,10 +373,14 @@ function gameLoop(currentTime) {
         const t = spawnToCanvas(room.targets[i]);
         return Math.abs(p.x - t.x) < 55 && Math.abs(p.y - t.y) < 55;
       });
+      if (emergencyExit && roomDoorUnlocked && emergencyExit.sprite.currentAnim === "closed") {
+        setSpriteAnimation(emergencyExit.sprite, "opening");
+        setTimeout(() => setSpriteAnimation(emergencyExit.sprite, "open"), 5 * 150);
+      }
     }
 
     // Check if player reached the door (requires pushables solved if room has them)
-    const doorBlocked = pushables.length > 0 && !roomDoorUnlocked;
+    const doorBlocked = (pushables.length > 0 && !roomDoorUnlocked) || (ROOMS[currentRoomIndex].hearts && !codingDarkUnlocked);
     if (checkDoorCollision() && !doorBlocked) {
       if (ROOMS[currentRoomIndex].id === "learn_to_walk") {
         gameState = "dissolving";
@@ -395,6 +410,7 @@ function gameLoop(currentTime) {
     updateSpriteAnimation(p.sprite, deltaTime);
   }
   if (trapdoor) updateSpriteAnimation(trapdoor.sprite, deltaTime);
+  if (emergencyExit) updateSpriteAnimation(emergencyExit.sprite, deltaTime);
 
   if (gameState === "intro") introElapsed += deltaTime;
   if (gameState === "dissolving") {

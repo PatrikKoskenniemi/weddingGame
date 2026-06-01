@@ -66,12 +66,22 @@ const SPRITE_SHEETS = {
       open:   { row: 0, col: 0, frames: 4, speed: 200, loop: false },
     },
   },
+  emergencyExit: {
+    src: "assets/sprites/animated_emergency_exit.png",
+    frameWidth: 16,
+    frameHeight: 48,
+    animations: {
+      closed:  { row: 0, col: 0, frames: 1, speed: 0 },
+      opening: { row: 0, col: 0, frames: 5, speed: 150, loop: false },
+      open:    { row: 0, col: 4, frames: 1, speed: 0 },
+    },
+  },
   heart: {
-    src: "assets/sprites/items.png",
+    src: "assets/sprites/heart_spritesheet_16x16.png",
     frameWidth: 16,
     frameHeight: 16,
     animations: {
-      pulse: { row: 1, col: 7, frames: 1, speed: 0 },
+      pulse: { row: 1, col: 0, frames: 3, speed: 160, pingPong: true },
     },
   },
 };
@@ -126,6 +136,7 @@ function createSpriteAnimation(sheetKey, initialAnimation) {
     currentAnim: initialAnimation,
     frameIndex: 0,
     elapsed: 0,
+    _dir: 1,
   };
 }
 
@@ -139,10 +150,23 @@ function updateSpriteAnimation(anim, deltaTime) {
   anim.elapsed += deltaTime;
   if (anim.elapsed >= animDef.speed) {
     anim.elapsed -= animDef.speed;
-    const next = anim.frameIndex + 1;
-    anim.frameIndex = (animDef.loop === false && next >= animDef.frames)
-      ? animDef.frames - 1
-      : next % animDef.frames;
+    if (animDef.pingPong) {
+      const next = anim.frameIndex + anim._dir;
+      if (next >= animDef.frames) {
+        anim._dir = -1;
+        anim.frameIndex = animDef.frames - 2;
+      } else if (next < 0) {
+        anim._dir = 1;
+        anim.frameIndex = 1;
+      } else {
+        anim.frameIndex = next;
+      }
+    } else {
+      const next = anim.frameIndex + 1;
+      anim.frameIndex = (animDef.loop === false && next >= animDef.frames)
+        ? animDef.frames - 1
+        : next % animDef.frames;
+    }
   }
 }
 
@@ -151,6 +175,7 @@ function setSpriteAnimation(anim, newAnim) {
   anim.currentAnim = newAnim;
   anim.frameIndex = 0;
   anim.elapsed = 0;
+  anim._dir = 1;
 }
 
 // --- Drawing ---

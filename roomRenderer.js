@@ -24,12 +24,12 @@ const ROOMS = [
     map: "assets/maps/single_life.json",
     year: "2015",
     title: "På Lokal",
-    door: { col: 15, row: 2, w: 2, h: 3 },
-    spawn: { col: 6, row: 9 },
+    door: { col: 8.5, row: 1, w: 1, h: 2.5 },
+    spawn: { col: 5, row: 9 },
     hearts: false,
     pushables: [
-      { col: 2, row: 7 },
-      { col: 12, row: 8 },
+      { col: 8, row: 5.5 },
+      { col: 8, row: 9.5 },
     ],
     targets: [
       { col: 9, row: 6.2 },
