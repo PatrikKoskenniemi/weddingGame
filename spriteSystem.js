@@ -67,12 +67,12 @@ const SPRITE_SHEETS = {
     },
   },
   emergencyExit: {
-    src: "assets/sprites/animated_emergency_exit.png",
+    src: "assets/sprites/animated_door_6.png",
     frameWidth: 16,
-    frameHeight: 48,
+    frameHeight: 32,
     animations: {
       closed:  { row: 0, col: 0, frames: 1, speed: 0 },
-      opening: { row: 0, col: 0, frames: 5, speed: 150, loop: false },
+      opening: { row: 0, col: 0, frames: 5, speed: 200, loop: false },
       open:    { row: 0, col: 4, frames: 1, speed: 0 },
     },
   },

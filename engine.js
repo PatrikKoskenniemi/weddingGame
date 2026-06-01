@@ -189,7 +189,7 @@ async function loadRoom(roomIndex, showPopover = false) {
     ? { sprite: createSpriteAnimation("trapdoor", "closed"), ...spawnToCanvas({ col: 13.5, row: 10 }) }
     : null;
   emergencyExit = room.id === "single_life"
-    ? { sprite: createSpriteAnimation("emergencyExit", "closed"), ...spawnToCanvas({ col: 8.6, row: 2.15 }) }
+    ? { sprite: createSpriteAnimation("emergencyExit", "closed"), ...spawnToCanvas({ col: 8.6, row: 2.5 }) }
     : null;
   if (room.hearts) spawnHearts(8);
 
@@ -288,9 +288,9 @@ function render() {
   if (emergencyExit) {
     if (roomDoorUnlocked) {
       ctx.fillStyle = "#000000";
-      ctx.fillRect(emergencyExit.x - T * S / 2, emergencyExit.y - T * S + 55, T * S, T * S * 3/2);
+      ctx.fillRect(emergencyExit.x -20, emergencyExit.y -32, T * S - 10, T * S + 40);
     }
-    drawSprite(ctx, emergencyExit.sprite, emergencyExit.x, emergencyExit.y, T * S, T * S * 3, "#00aa00");
+    drawSprite(ctx, emergencyExit.sprite, emergencyExit.x, emergencyExit.y - 9, T * S * 1.3, T * S * 2.5, "#00aa00");
   }
   drawHearts();
   drawTargetMarkersOverlay();
