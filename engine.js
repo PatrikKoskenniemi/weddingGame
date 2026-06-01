@@ -319,6 +319,7 @@ function render() {
       : [];
     drawDiscoOverlay(ctx, litSpots);
     drawPustervikSign(ctx);
+    drawYakiDaSign(ctx);
   }
   drawScore();
 
@@ -461,6 +462,7 @@ const allLoads = [
   SpriteLoader.load("assets/images/time_spiral.webp"),
   SpriteLoader.load("assets/images/start_screen.png"),
   SpriteLoader.load("assets/images/pustervik_sign.png"),
+  SpriteLoader.load("assets/images/yaki_da_sign.png"),
   SoundSystem.preloadAll(SOUNDS),
 ];
 Promise.allSettled(allLoads).then(async () => {

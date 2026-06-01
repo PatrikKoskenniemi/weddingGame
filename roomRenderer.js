@@ -526,6 +526,16 @@ function drawPustervikSign(targetCtx) {
   targetCtx.drawImage(img, x, y, w, h);
 }
 
+function drawYakiDaSign(targetCtx) {
+  const img = SpriteLoader.get("assets/images/yaki_da_sign.png");
+  if (!img) return;
+  const w = 3.3 * T * S;
+  const h = Math.round(w * img.naturalHeight / img.naturalWidth);
+  const x = ROOM_BOUNDS.x + 3 * T * S;
+  const y = ROOM_BOUNDS.y + Math.round((ROOM_BOUNDS.wallHeight - h) / 2) + 20;
+  targetCtx.drawImage(img, x, y, w, h);
+}
+
 // --- Disco Overlay ---
 
 function drawDiscoOverlay(targetCtx, litSpots = []) {
