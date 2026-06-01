@@ -51,6 +51,7 @@ let hearts = [];
 let pushables = [];
 let roomDoorUnlocked = false;
 let codingDarkUnlocked = false;
+let trapdoorAboveOverlay = false;
 let roomPopoverActive = false;
 let trapdoor = null;
 let dissolveSoundSource = null;
@@ -181,9 +182,10 @@ async function loadRoom(roomIndex, showPopover = false) {
   // Reset hearts for new room
   hearts = [];
   codingDarkUnlocked = false;
+  trapdoorAboveOverlay = false;
   roomPopoverActive = showPopover && !!room.popover;
   trapdoor = room.id === "coding_in_the_dark"
-    ? { sprite: createSpriteAnimation("trapdoor", "closed"), ...spawnToCanvas({ col: 12, row: 6 }) }
+    ? { sprite: createSpriteAnimation("trapdoor", "closed"), ...spawnToCanvas({ col: 13.5, row: 10 }) }
     : null;
   if (room.hearts) spawnHearts(8);
 
@@ -282,14 +284,16 @@ function render() {
   drawHearts();
   drawTargetMarkersOverlay();
   drawPushables();
-  if (trapdoor && !codingDarkUnlocked) {
+  if (trapdoor && !trapdoorAboveOverlay) {
     drawSprite(ctx, trapdoor.sprite, trapdoor.x, trapdoor.y, T * S, T * S, "#553300");
   }
   drawPlayer();
   if (ROOMS[currentRoomIndex].id === "coding_in_the_dark") {
     drawSpotlightOverlay(ctx, player, codingDarkUnlocked);
   }
-  if (trapdoor && codingDarkUnlocked) {
+  if (trapdoor && trapdoorAboveOverlay) {
+    ctx.fillStyle = "#000000";
+    ctx.fillRect(trapdoor.x - T * S / 2, trapdoor.y - T * S / 2, T * S, T * S);
     drawSprite(ctx, trapdoor.sprite, trapdoor.x, trapdoor.y, T * S, T * S, "#553300");
   }
   if (ROOMS[currentRoomIndex].id === "single_life") {
@@ -341,9 +345,9 @@ function gameLoop(currentTime) {
     updatePlayerPosition(player, keysPressed);
     score += checkHeartCollection(player, hearts);
 
-    if (hearts.length === 0 && ROOMS[currentRoomIndex].id === "coding_in_the_dark") {
+    if (hearts.length === 0 && ROOMS[currentRoomIndex].id === "coding_in_the_dark" && !codingDarkUnlocked) {
       codingDarkUnlocked = true;
-      if (trapdoor) setSpriteAnimation(trapdoor.sprite, "open");
+      if (trapdoor) setTimeout(() => { trapdoorAboveOverlay = true; setSpriteAnimation(trapdoor.sprite, "open"); }, 1500);
     }
 
     // Push characters and clamp to room bounds

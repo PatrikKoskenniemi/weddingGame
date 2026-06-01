@@ -63,7 +63,7 @@ const SPRITE_SHEETS = {
     frameHeight: 16,
     animations: {
       closed: { row: 0, col: 0, frames: 1, speed: 0 },
-      open:   { row: 0, col: 0, frames: 6, speed: 120, loop: false },
+      open:   { row: 0, col: 0, frames: 4, speed: 200, loop: false },
     },
   },
   heart: {
