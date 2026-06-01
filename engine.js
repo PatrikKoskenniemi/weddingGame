@@ -312,10 +312,9 @@ function render() {
   if (ROOMS[currentRoomIndex].id === "single_life") {
     const room = ROOMS[currentRoomIndex];
     const litSpots = room.targets
-      ? pushables
-          .map((p, i) => ({ p, t: spawnToCanvas(room.targets[i]) }))
-          .filter(({ p, t }) => Math.abs(p.x - t.x) < 55 && Math.abs(p.y - t.y) < 55)
-          .map(({ t }) => t)
+      ? room.targets
+          .map(t => spawnToCanvas(t))
+          .filter(tc => pushables.some(p => Math.abs(p.x - tc.x) < 55 && Math.abs(p.y - tc.y) < 55))
       : [];
     drawDiscoOverlay(ctx, litSpots);
     drawPustervikSign(ctx);
