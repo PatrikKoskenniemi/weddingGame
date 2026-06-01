@@ -57,6 +57,15 @@ const SPRITE_SHEETS = {
       dance:      { row: 11, col: 0, frames: 56, speed: 100 },
     },
   },
+  trapdoor: {
+    src: "assets/sprites/animated_trapdoor_1.png",
+    frameWidth: 16,
+    frameHeight: 16,
+    animations: {
+      closed: { row: 0, col: 0, frames: 1, speed: 0 },
+      open:   { row: 0, col: 0, frames: 6, speed: 120, loop: false },
+    },
+  },
   heart: {
     src: "assets/sprites/items.png",
     frameWidth: 16,
@@ -130,7 +139,10 @@ function updateSpriteAnimation(anim, deltaTime) {
   anim.elapsed += deltaTime;
   if (anim.elapsed >= animDef.speed) {
     anim.elapsed -= animDef.speed;
-    anim.frameIndex = (anim.frameIndex + 1) % animDef.frames;
+    const next = anim.frameIndex + 1;
+    anim.frameIndex = (animDef.loop === false && next >= animDef.frames)
+      ? animDef.frames - 1
+      : next % animDef.frames;
   }
 }
 

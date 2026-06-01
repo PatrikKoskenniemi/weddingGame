@@ -59,8 +59,14 @@ function pushCharacters(player, characters) {
 }
 
 function checkHeartCollection(player, hearts) {
-  // TODO: Check if player overlaps any hearts
-  // TODO: Remove collected hearts from the array
-  // TODO: Return total points collected this frame
-  return 0;
+  let points = 0;
+  for (let i = hearts.length - 1; i >= 0; i--) {
+    const dx = player.x - hearts[i].x;
+    const dy = player.y - hearts[i].y;
+    if (Math.sqrt(dx * dx + dy * dy) < player.size / 2 + hearts[i].size / 2) {
+      points += hearts[i].points;
+      hearts.splice(i, 1);
+    }
+  }
+  return points;
 }

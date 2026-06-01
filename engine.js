@@ -52,6 +52,7 @@ let pushables = [];
 let roomDoorUnlocked = false;
 let codingDarkUnlocked = false;
 let roomPopoverActive = false;
+let trapdoor = null;
 let dissolveSoundSource = null;
 let timeMachineSoundSource = null;
 
@@ -181,6 +182,9 @@ async function loadRoom(roomIndex, showPopover = false) {
   hearts = [];
   codingDarkUnlocked = false;
   roomPopoverActive = showPopover && !!room.popover;
+  trapdoor = room.id === "coding_in_the_dark"
+    ? { sprite: createSpriteAnimation("trapdoor", "closed"), ...spawnToCanvas({ col: 12, row: 6 }) }
+    : null;
   if (room.hearts) spawnHearts(8);
 
   // Spawn pushable characters from room config
@@ -282,6 +286,9 @@ function render() {
   if (ROOMS[currentRoomIndex].id === "coding_in_the_dark") {
     drawSpotlightOverlay(ctx, player, codingDarkUnlocked);
   }
+  if (trapdoor) {
+    drawSprite(ctx, trapdoor.sprite, trapdoor.x, trapdoor.y, T * S, T * S, "#553300");
+  }
   if (ROOMS[currentRoomIndex].id === "single_life") {
     const room = ROOMS[currentRoomIndex];
     const litSpots = room.targets
@@ -333,6 +340,7 @@ function gameLoop(currentTime) {
 
     if (hearts.length === 0 && ROOMS[currentRoomIndex].id === "coding_in_the_dark") {
       codingDarkUnlocked = true;
+      if (trapdoor) setSpriteAnimation(trapdoor.sprite, "open");
     }
 
     // Push characters and clamp to room bounds
@@ -380,6 +388,7 @@ function gameLoop(currentTime) {
   for (const p of pushables) {
     updateSpriteAnimation(p.sprite, deltaTime);
   }
+  if (trapdoor) updateSpriteAnimation(trapdoor.sprite, deltaTime);
 
   if (gameState === "intro") introElapsed += deltaTime;
   if (gameState === "dissolving") {
