@@ -288,6 +288,7 @@ function render() {
   drawBackground();
   drawAnimatedTiles(ctx);
   drawRoomForeground();
+  if (ROOMS[currentRoomIndex].showTitle !== false) drawRoomTitle(ctx);
   if (emergencyExit) {
     if (emergencyExit.sprite.currentAnim !== "closed") {
       ctx.fillStyle = "#000000";
@@ -319,7 +320,6 @@ function render() {
     drawDiscoOverlay(ctx, litSpots);
     drawPustervikSign(ctx);
   }
-  if (ROOMS[currentRoomIndex].showTitle !== false) drawRoomTitle(ctx);
   drawScore();
 
   if (gameState === "dissolving") {
