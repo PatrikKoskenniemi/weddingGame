@@ -28,8 +28,8 @@ const ROOMS = [
     spawn: { col: 5, row: 9 },
     hearts: false,
     pushables: [
-      { col: 8, row: 5.5 },
-      { col: 8, row: 9.5 },
+      { col: 3, row: 7.5 },
+      { col: 10, row: 2.5 },
     ],
     targets: [
       { col: 9, row: 6.2 },
@@ -794,7 +794,7 @@ function drawTimeMachineScreen(targetCtx, elapsed) {
   targetCtx.font = "bold 52px monospace";
   targetCtx.fillStyle = "rgba(0,0,0,0.5)";
   targetCtx.fillText("RESER TILLBAKA I TIDEN...", cx + 3, cy - 40 + 3);
-  targetCtx.fillStyle = "#f0e040";
+  targetCtx.fillStyle = "#6b5bff";
   targetCtx.fillText("RESER TILLBAKA I TIDEN...", cx, cy - 40);
 
   // Year display
