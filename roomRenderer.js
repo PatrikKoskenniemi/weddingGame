@@ -61,7 +61,7 @@ const ROOMS = [
     map: "assets/maps/coding_in_the_dark.json",
     year: "",
     title: "Code in the Dark",
-    door: { col: 14, row: 2, w: 2, h: 3 },
+    door: { col: 13.5, row: 10, w: 2, h: 6 },
     spawn: { col: 2.5, row: 6.5 },
     hearts: true,
     showTitle: false,
@@ -614,7 +614,7 @@ function heartPath(ctx, cx, cy, r) {
   ctx.restore();
 }
 
-function drawSpotlightOverlay(targetCtx, player, unlocked) {
+function drawSpotlightOverlay(targetCtx, player, unlocked, trapdoorSpot = null) {
   const offscreen = document.createElement("canvas");
   offscreen.width = CANVAS_WIDTH;
   offscreen.height = CANVAS_HEIGHT;
@@ -668,10 +668,11 @@ function drawSpotlightOverlay(targetCtx, player, unlocked) {
       oc.restore();
     };
 
+    // Always keep the north wall (logo/screen) fully visible
+    oc.fillStyle = "rgba(255,255,255,1)";
+    oc.fillRect(6.13 * T * S, 6, 495, 166);
+
     if (progress >= 1) {
-      // Animation done — draw full heart + clear north wall
-      oc.fillStyle = "rgba(255,255,255,1)";
-      oc.fillRect(6.13 * T * S, 6, 495, 166);
       drawHalfHeart(0, cx, 0);
       drawHalfHeart(cx, CANVAS_WIDTH - cx, 0);
     } else {
@@ -680,6 +681,11 @@ function drawSpotlightOverlay(targetCtx, player, unlocked) {
       drawHalfHeart(0, cx, leftOffset);
       drawHalfHeart(cx, CANVAS_WIDTH - cx, rightOffset);
     }
+  }
+
+  if (trapdoorSpot) {
+    oc.fillStyle = "rgba(255,255,255,1)";
+    oc.fillRect(trapdoorSpot.x - T * S / 2, trapdoorSpot.y - T * S / 2, T * S, T * S);
   }
 
   targetCtx.drawImage(offscreen, 0, 0);

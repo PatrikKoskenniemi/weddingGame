@@ -284,17 +284,16 @@ function render() {
   drawHearts();
   drawTargetMarkersOverlay();
   drawPushables();
-  if (trapdoor && !trapdoorAboveOverlay) {
+  if (trapdoor) {
+    if (trapdoorAboveOverlay) {
+      ctx.fillStyle = "#000000";
+      ctx.fillRect(trapdoor.x - T * S / 2, trapdoor.y - T * S / 2, T * S, T * S);
+    }
     drawSprite(ctx, trapdoor.sprite, trapdoor.x, trapdoor.y, T * S, T * S, "#553300");
   }
   drawPlayer();
   if (ROOMS[currentRoomIndex].id === "coding_in_the_dark") {
-    drawSpotlightOverlay(ctx, player, codingDarkUnlocked);
-  }
-  if (trapdoor && trapdoorAboveOverlay) {
-    ctx.fillStyle = "#000000";
-    ctx.fillRect(trapdoor.x - T * S / 2, trapdoor.y - T * S / 2, T * S, T * S);
-    drawSprite(ctx, trapdoor.sprite, trapdoor.x, trapdoor.y, T * S, T * S, "#553300");
+    drawSpotlightOverlay(ctx, player, codingDarkUnlocked, trapdoorAboveOverlay ? trapdoor : null);
   }
   if (ROOMS[currentRoomIndex].id === "single_life") {
     const room = ROOMS[currentRoomIndex];
