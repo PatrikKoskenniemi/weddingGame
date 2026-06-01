@@ -282,11 +282,14 @@ function render() {
   drawHearts();
   drawTargetMarkersOverlay();
   drawPushables();
+  if (trapdoor && !codingDarkUnlocked) {
+    drawSprite(ctx, trapdoor.sprite, trapdoor.x, trapdoor.y, T * S, T * S, "#553300");
+  }
   drawPlayer();
   if (ROOMS[currentRoomIndex].id === "coding_in_the_dark") {
     drawSpotlightOverlay(ctx, player, codingDarkUnlocked);
   }
-  if (trapdoor) {
+  if (trapdoor && codingDarkUnlocked) {
     drawSprite(ctx, trapdoor.sprite, trapdoor.x, trapdoor.y, T * S, T * S, "#553300");
   }
   if (ROOMS[currentRoomIndex].id === "single_life") {
