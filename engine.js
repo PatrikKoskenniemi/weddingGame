@@ -55,6 +55,7 @@ let trapdoorAboveOverlay = false;
 let roomPopoverActive = false;
 let trapdoor = null;
 let emergencyExit = null;
+let emergencyExitTimeout = null;
 let dissolveSoundSource = null;
 let timeMachineSoundSource = null;
 
@@ -188,6 +189,8 @@ async function loadRoom(roomIndex, showPopover = false) {
   trapdoor = room.id === "coding_in_the_dark"
     ? { sprite: createSpriteAnimation("trapdoor", "closed"), ...spawnToCanvas({ col: 13.5, row: 10 }) }
     : null;
+  clearTimeout(emergencyExitTimeout);
+  emergencyExitTimeout = null;
   emergencyExit = room.id === "single_life"
     ? { sprite: createSpriteAnimation("emergencyExit", "closed"), ...spawnToCanvas({ col: 8.6, row: 2.5 }) }
     : null;
@@ -286,7 +289,7 @@ function render() {
   drawAnimatedTiles(ctx);
   drawRoomForeground();
   if (emergencyExit) {
-    if (roomDoorUnlocked) {
+    if (emergencyExit.sprite.currentAnim !== "closed") {
       ctx.fillStyle = "#000000";
       ctx.fillRect(emergencyExit.x -20, emergencyExit.y -32, T * S - 10, T * S + 40);
     }
@@ -367,15 +370,21 @@ function gameLoop(currentTime) {
         p.x = Math.max(ROOM_BOUNDS.x + p.size / 2, Math.min(ROOM_BOUNDS.x + ROOM_BOUNDS.w - p.size / 2, p.x));
         p.y = Math.max(ROOM_BOUNDS.y + ROOM_BOUNDS.wallHeight + p.size / 2, Math.min(ROOM_BOUNDS.y + ROOM_BOUNDS.h - p.size / 2, p.y));
       }
-      // Unlock door when all pushables are on their targets
+      // Unlock door when every target has at least one pushable on it
       const room = ROOMS[currentRoomIndex];
-      roomDoorUnlocked = pushables.every((p, i) => {
-        const t = spawnToCanvas(room.targets[i]);
-        return Math.abs(p.x - t.x) < 55 && Math.abs(p.y - t.y) < 55;
+      roomDoorUnlocked = room.targets.every(t => {
+        const tc = spawnToCanvas(t);
+        return pushables.some(p => Math.abs(p.x - tc.x) < 55 && Math.abs(p.y - tc.y) < 55);
       });
-      if (emergencyExit && roomDoorUnlocked && emergencyExit.sprite.currentAnim === "closed") {
-        setSpriteAnimation(emergencyExit.sprite, "opening");
-        setTimeout(() => setSpriteAnimation(emergencyExit.sprite, "open"), 5 * 150);
+      if (emergencyExit) {
+        if (roomDoorUnlocked && emergencyExit.sprite.currentAnim === "closed") {
+          setSpriteAnimation(emergencyExit.sprite, "opening");
+          emergencyExitTimeout = setTimeout(() => setSpriteAnimation(emergencyExit.sprite, "open"), 5 * 200);
+        } else if (!roomDoorUnlocked && emergencyExit.sprite.currentAnim !== "closed") {
+          clearTimeout(emergencyExitTimeout);
+          emergencyExitTimeout = null;
+          setSpriteAnimation(emergencyExit.sprite, "closed");
+        }
       }
     }
 
