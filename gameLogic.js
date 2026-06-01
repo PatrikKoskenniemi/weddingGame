@@ -10,13 +10,13 @@ function updatePlayerPosition(player, keysPressed) {
   if(keysPressed.ArrowUp){
     player.y = player.y-speed
   }
-    if(keysPressed.ArrowDown){
+  if(keysPressed.ArrowDown){
     player.y = player.y+speed
   }
-      if(keysPressed.ArrowLeft){
+  if(keysPressed.ArrowLeft){
     player.x = player.x-speed
   }
-      if(keysPressed.ArrowRight){
+  if(keysPressed.ArrowRight){
     player.x = player.x+speed
   }
 
