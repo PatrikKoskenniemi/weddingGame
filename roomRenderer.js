@@ -39,7 +39,7 @@ const ROOMS = [
       title: "På lokal",
       lines: [
         "Annie har landat i 2015.",
-        "En tid av pingisbord, sommarjobb på Liseberg",
+        "En tid av Yrgo och praktikplatser, pingisbord på nattklubbarna",
         "och alldeles för många #TBT Instagram-poster",
         "",
         "På dansgolvet: Gustav",
@@ -55,6 +55,12 @@ const ROOMS = [
         "Putta Gustav och Elina till pingisbordet.",
       ],
     },
+    completeLines: [
+      "Gustav och Elina spelar sin pingis-match och dom börjar dejta.",
+      "Det går bra till en början och Annie börjar undra varför hon bara är 2 år gammal",
+      "Men så händer något och mitt framför ögonen på Annie så tar det helt plötsligt slut.",
+      "Vår hjältinna tvekar dock inte och kastar sig rakt in i nästa portal, \"detta måste gå!\"",
+    ],
   },
   {
     id: "coding_in_the_dark",
@@ -65,6 +71,19 @@ const ROOMS = [
     spawn: { col: 2.5, row: 6.5 },
     hearts: true,
     showTitle: false,
+    popover: {
+      title: "Stockholm - 2016???",
+      lines: [
+        "Vart är jag? Och varför är det så mörkt här?",
+        "Men kolla, där på scenen sitter ju mamma och pappa!",
+        "Dom skrattar och ler åt varandra!",
+        "Nu har jag min chans,",
+        "om jag bara samlar upp alla hjärtan",
+        "så måste dom hitta tillbaka till varandra igen.",
+        "Åhh neej, det går ju inte att plocka upp dom...",
+        "Samla alla hjärtan",
+      ],
+    },
   },
   {
     id: "wedding",
@@ -845,10 +864,20 @@ function drawLevelComplete(targetCtx, roomInfo) {
   targetCtx.fillStyle = "#fff";
   targetCtx.fillText(roomInfo.year + " — " + roomInfo.title, cx, cy + 20);
 
-  // "Press space"
+  // Optional extra lines from room config
+  const extraLines = roomInfo.completeLines || [];
+  const lineH = 28;
+  targetCtx.font = "20px monospace";
+  targetCtx.fillStyle = "rgba(255,255,255,0.85)";
+  for (let i = 0; i < extraLines.length; i++) {
+    targetCtx.fillText(extraLines[i], cx, cy + 60 + i * lineH);
+  }
+
+  // "Press space" — pushed down to clear extra lines
+  const pressSpaceY = cy + 60 + extraLines.length * lineH + (extraLines.length > 0 ? 20 : 10);
   targetCtx.font = "22px monospace";
   targetCtx.fillStyle = "rgba(255,255,255,0.6)";
-  targetCtx.fillText("Press space to continue...", cx, cy + 70);
+  targetCtx.fillText("Press space to continue...", cx, pressSpaceY);
 
   targetCtx.restore();
 }
