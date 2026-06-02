@@ -39,7 +39,8 @@ const ROOMS = [
       title: "På lokal",
       lines: [
         "Annie har landat i 2015.",
-        "En tid av Yrgo och praktikplatser, pingisbord på nattklubbarna",
+        "En tid av Yrgo och praktikplatser,",
+        "pingisbord på nattklubbarna",
         "och alldeles för många #TBT Instagram-poster",
         "",
         "På dansgolvet: Gustav",
@@ -57,9 +58,12 @@ const ROOMS = [
     },
     completeLines: [
       "Gustav och Elina spelar sin pingis-match och dom börjar dejta.",
-      "Det går bra till en början och Annie börjar undra varför hon bara är 2 år gammal",
-      "Men så händer något och mitt framför ögonen på Annie så tar det helt plötsligt slut.",
-      "Vår hjältinna tvekar dock inte och kastar sig rakt in i nästa portal, \"detta måste gå!\"",
+      "Det går bra till en början",
+      "och Annie börjar undra varför hon bara är 2 år gammal",
+      "Men så händer något och mitt framför ögonen på Annie",
+      "och plötsligt tar relationen.",
+      "Vår hjältinna tvekar dock inte och kastar sig rakt in i nästa portal.",
+      " \"Detta måste gå!\"",
     ],
   },
   {
@@ -81,8 +85,10 @@ const ROOMS = [
         "om jag bara samlar upp alla hjärtan",
         "så måste dom hitta tillbaka till varandra igen.",
         "Åhh neej, det går ju inte att plocka upp dom...",
-        "Samla alla hjärtan",
+        "",
+        "Samla alla hjärtan innan det är försent!",
       ],
+      height: 470
     },
   },
   {
@@ -855,26 +861,26 @@ function drawLevelComplete(targetCtx, roomInfo) {
   // "Level Complete!" — large
   targetCtx.font = "bold 52px monospace";
   targetCtx.fillStyle = "rgba(0,0,0,0.4)";
-  targetCtx.fillText("Level Complete!", cx + 3, cy - 40 + 3);
+  targetCtx.fillText("Level Complete!", cx + 3, cy - 180 + 3);
   targetCtx.fillStyle = "#ffd700";
-  targetCtx.fillText("Level Complete!", cx, cy - 40);
+  targetCtx.fillText("Level Complete!", cx, cy - 180);
 
-  // Room title — 20px gap below "Level Complete!"
+  // Room title — gap below "Level Complete!"
   targetCtx.font = "bold 28px monospace";
   targetCtx.fillStyle = "#fff";
-  targetCtx.fillText(roomInfo.year + " — " + roomInfo.title, cx, cy + 20);
+  targetCtx.fillText(roomInfo.year + " — " + roomInfo.title, cx, cy - 80);
 
   // Optional extra lines from room config
   const extraLines = roomInfo.completeLines || [];
-  const lineH = 28;
-  targetCtx.font = "20px monospace";
+  const lineH = 36;
+  targetCtx.font = "28px monospace";
   targetCtx.fillStyle = "rgba(255,255,255,0.85)";
   for (let i = 0; i < extraLines.length; i++) {
-    targetCtx.fillText(extraLines[i], cx, cy + 60 + i * lineH);
+    targetCtx.fillText(extraLines[i], cx, cy - 30 + i * lineH);
   }
 
   // "Press space" — pushed down to clear extra lines
-  const pressSpaceY = cy + 60 + extraLines.length * lineH + (extraLines.length > 0 ? 20 : 10);
+  const pressSpaceY = cy - 30 + extraLines.length * lineH + (extraLines.length > 0 ? 24 : 10);
   targetCtx.font = "22px monospace";
   targetCtx.fillStyle = "rgba(255,255,255,0.6)";
   targetCtx.fillText("Press space to continue...", cx, pressSpaceY);
@@ -1049,7 +1055,7 @@ function drawRoomPopover(targetCtx, popover) {
   targetCtx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
   const panelW = 780;
-  const panelH = 650;
+  const panelH = popover.height || 650;
   const px = cx - panelW / 2;
   const py = cy - panelH / 2;
 
