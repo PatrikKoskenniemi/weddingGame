@@ -99,6 +99,10 @@ const ROOMS = [
     door: { col: 15, row: 5, w: 1, h: 2 },
     spawn: { col: 2, row: 9 },
     hearts: false,
+    aisleNpcs: [
+      { spriteKey: "npc1", start: { col: 7.1, row: 10 }, end: { col: 7.1, row: 4.3 }, turnDelay: 5000 },
+      { spriteKey: "npc2", start: { col: 7.9, row: 10 }, end: { col: 7.9, row: 4.3 }, turnDelay: 5000 },
+    ],
   },
 ];
 

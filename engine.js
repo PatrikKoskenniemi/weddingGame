@@ -49,6 +49,7 @@ const startScreenSprites = {
 let hearts = [];
 
 let pushables = [];
+let scriptedNpcs = [];
 let roomDoorUnlocked = false;
 let codingDarkUnlocked = false;
 let trapdoorAboveOverlay = false;
@@ -211,6 +212,29 @@ async function loadRoom(roomIndex, showPopover = false) {
     : null;
   if (room.hearts) spawnHearts(8);
 
+  // Spawn scripted (auto-walking) NPCs from room config
+  scriptedNpcs = [];
+  if (room.aisleNpcs) {
+    for (const cfg of room.aisleNpcs) {
+      const start = spawnToCanvas(cfg.start);
+      const end   = spawnToCanvas(cfg.end);
+      const dx = end.x - start.x;
+      const dy = end.y - start.y;
+      let walkAnim = "walk_down";
+      if (Math.abs(dy) >= Math.abs(dx)) walkAnim = dy < 0 ? "walk_up" : "walk_down";
+      else walkAnim = dx < 0 ? "walk_left" : "walk_right";
+      scriptedNpcs.push({
+        x: start.x, y: start.y,
+        targetX: end.x, targetY: end.y,
+        size: 64,
+        sprite: createSpriteAnimation(cfg.spriteKey, walkAnim),
+        state: "walking",
+        stateElapsed: 0,
+        turnDelay: cfg.turnDelay ?? 2500,
+      });
+    }
+  }
+
   // Spawn pushable characters from room config
   pushables = [];
   roomDoorUnlocked = false;
@@ -274,6 +298,12 @@ function drawPushables() {
   }
 }
 
+function drawScriptedNpcs() {
+  for (const npc of scriptedNpcs) {
+    drawSprite(ctx, npc.sprite, npc.x, npc.y, npc.size, npc.size * 2, "#ff8844");
+  }
+}
+
 function drawTargetMarkersOverlay() {
   const room = ROOMS[currentRoomIndex];
   if (!room.targets || pushables.length === 0) return;
@@ -314,6 +344,7 @@ function render() {
   drawHearts();
   drawTargetMarkersOverlay();
   drawPushables();
+  drawScriptedNpcs();
   if (trapdoor) {
     if (trapdoorAboveOverlay) {
       ctx.fillStyle = "#000000";
@@ -358,6 +389,34 @@ function render() {
 function checkRespawn() {
   if (hearts.length === 0 && ROOMS[currentRoomIndex].hearts && !codingDarkUnlocked) {
     spawnHearts(8);
+  }
+}
+
+// --- Scripted NPC Update ---
+function updateScriptedNpcs(deltaTime) {
+  for (const npc of scriptedNpcs) {
+    if (npc.state === "walking") {
+      const dx = npc.targetX - npc.x;
+      const dy = npc.targetY - npc.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      const speed = 0.3;
+      if (dist <= speed) {
+        npc.x = npc.targetX;
+        npc.y = npc.targetY;
+        npc.state = "turned";
+        npc.stateElapsed = 0;
+        setSpriteAnimation(npc.sprite, "idle_down");
+      } else {
+        npc.x += (dx / dist) * speed;
+        npc.y += (dy / dist) * speed;
+      }
+    } else if (npc.state === "turned") {
+      npc.stateElapsed += deltaTime;
+      if (npc.stateElapsed >= npc.turnDelay) {
+        npc.state = "dancing";
+        setSpriteAnimation(npc.sprite, "dance");
+      }
+    }
   }
 }
 
@@ -416,6 +475,8 @@ function gameLoop(currentTime) {
       }
     }
 
+    updateScriptedNpcs(deltaTime);
+
     // Respawn hearts when all collected
     checkRespawn();
   }
@@ -432,6 +493,9 @@ function gameLoop(currentTime) {
   }
   for (const p of pushables) {
     updateSpriteAnimation(p.sprite, deltaTime);
+  }
+  for (const npc of scriptedNpcs) {
+    updateSpriteAnimation(npc.sprite, deltaTime);
   }
   if (trapdoor) updateSpriteAnimation(trapdoor.sprite, deltaTime);
   if (emergencyExit) updateSpriteAnimation(emergencyExit.sprite, deltaTime);
