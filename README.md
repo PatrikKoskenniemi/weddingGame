@@ -2,77 +2,49 @@
 
 Hej brudparet!
 
-Det här finns ett litet spel som vi har byggt till er. Ni ska live-koda spellogiken tillsammans på scenen medan alla tittar på storbilden. Inga panik — det är lättare än det låter!
-
-## Hur funkar det?
-
-Spelet är redan byggt och körs i webbläsaren. Allt renderas, figuren syns, hjärtan poppar upp — men ingenting funkar än! Det är där ni kommer in.
-
-Ni ska skriva koden som får spelet att fungera. Ni behöver bara röra **en enda fil**:
-
-```
-gameLogic.js
-```
-
-Det är er fil. Allt annat är färdigbyggt.
+Det här är ett litet spel som vi har byggt till er. Ni ska live-koda spellogiken tillsammans på scenen medan alla tittar på storbilden. Inga panik — det är lättare än det låter!
 
 ## Hur kör man spelet?
 
 1. Öppna en terminal i projektmappen
 2. Kör: `python3 -m http.server 8080`
 3. Öppna `http://localhost:8080` i Chrome
-4. Tryck F5 för att ladda om efter ni ändrat koden
+4. Spara filen och tryck F5 för att ladda om efter ni ändrat koden
 
-Ni behöver aldrig stänga servern — bara spara filen och tryck F5!
+## Er fil
 
-## Vad ska ni göra?
+Ni behöver bara röra **en enda fil**: `gameLogic.js`
 
-I `gameLogic.js` finns två funktioner som ni ska implementera:
+Den innehåller tre funktioner som ni ska implementera:
 
-### 1. `updatePlayerPosition(player, keysPressed)`
+### `updatePlayerPosition(player, keysPressed)`
+Få figuren att röra sig med piltangenterna.
+- `player.x` och `player.y` är figurens position
+- `keysPressed.ArrowUp/Down/Left/Right` är `true` om tangenten är nedtryckt
 
-Få figuren att röra sig med piltangenterna!
+### `pushCharacters(player, characters)`
+Låt figuren knuffa på karaktärerna.
+- `characters` är en lista med karaktärer, varje en har `x`, `y` och `size`
+- Flytta en karaktär bort från figuren om dom överlappar
 
-Ni har tillgång till:
-- `player.x` och `player.y` — figurens position (mitten)
-- `player.speed` — hur snabbt figuren rör sig (4)
-- `keysPressed.ArrowUp`, `keysPressed.ArrowDown`, `keysPressed.ArrowLeft`, `keysPressed.ArrowRight` — `true` om tangenten är nedtryckt
-
-Tips:
-- Flytta `player.x` och `player.y` baserat på vilka tangenter som är nedtryckta
-- Använd `player.speed` för att bestämma hur långt figuren rör sig
-- Se till att figuren inte går utanför skärmkanten! Använd `CANVAS_WIDTH` (1280) och `CANVAS_HEIGHT` (720)
-- Bonusutmaning: om man går diagonalt (två tangenter samtidigt) ska man inte gå snabbare
-
-### 2. `checkHeartCollection(player, hearts)`
-
-Samla hjärtan och få poäng!
-
-Ni har tillgång till:
-- `player.x`, `player.y`, `player.size` — figurens position och storlek
-- `hearts` — en lista med hjärtan, varje hjärta har `x`, `y`, `size` och `points`
-
-Vad funktionen ska göra:
-- Kolla om figuren överlappar något hjärta
-- Ta bort hjärtan som samlats in från listan
-- Returnera hur många poäng ni fick den här bildrutan
-
-Tips:
-- Två objekt överlappar om avståndet mellan dem är mindre än summan av deras halva storlekar
+### `checkHeartCollection(player, hearts)`
+Ta bort hjärtan som figuren rör vid.
+- `hearts` är en lista med hjärtan, varje ett har `x`, `y` och `size`
 - Använd `hearts.splice(i, 1)` för att ta bort ett hjärta från listan
-- Glöm inte att returnera poängen! (inte bara `0`)
 
 ## Fusklapp
 
-Dessa variabler finns tillgängliga överallt i `gameLogic.js`:
-
 | Variabel | Värde | Beskrivning |
 |----------|-------|-------------|
-| `CANVAS_WIDTH` | 1280 | Skärmens bredd |
-| `CANVAS_HEIGHT` | 720 | Skärmens höjd |
 | `player.x` | | Figurens x-position (mitten) |
 | `player.y` | | Figurens y-position (mitten) |
 | `player.size` | 48 | Figurens storlek |
 | `player.speed` | 4 | Figurens hastighet |
+| `characters[i].x` | | Karaktärens x-position |
+| `characters[i].y` | | Karaktärens y-position |
+| `characters[i].size` | 64 | Karaktärens storlek |
+| `hearts[i].x` | | Hjärtats x-position |
+| `hearts[i].y` | | Hjärtats y-position |
+| `hearts[i].size` | 32 | Hjärtats storlek |
 
 Lycka till, och grattis!

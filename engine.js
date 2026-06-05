@@ -38,8 +38,6 @@ const player = {
   _prevY: CANVAS_HEIGHT / 2,
 };
 
-let score = 0;
-
 const startScreenSprites = {
   annie:  createSpriteAnimation("player", "idle_down"),
   gustav: createSpriteAnimation("npc1",   "idle_down"),
@@ -72,7 +70,6 @@ function spawnHearts(count) {
       x: Math.random() * (maxX - minX) + minX,
       y: Math.random() * (maxY - minY) + minY,
       size: 32,
-      points: 1,
       sprite: createSpriteAnimation("heart", "pulse"),
     });
   }
@@ -310,14 +307,6 @@ function drawTargetMarkersOverlay() {
   drawTargetMarkers(ctx, room.targets);
 }
 
-function drawScore() {
-  ctx.fillStyle = "#ffffff";
-  ctx.font = "bold 36px monospace";
-  ctx.textAlign = "left";
-  ctx.textBaseline = "top";
-  ctx.fillText("Score: " + score, 20, 20);
-}
-
 function drawBackground() {
   drawRoomBackground();
 }
@@ -367,7 +356,6 @@ function render() {
     drawPustervikSign(ctx);
     drawYakiDaSign(ctx);
   }
-  drawScore();
 
   if (gameState === "dissolving") {
     ctx.restore();
@@ -399,7 +387,7 @@ function updateScriptedNpcs(deltaTime) {
       const dx = npc.targetX - npc.x;
       const dy = npc.targetY - npc.y;
       const dist = Math.sqrt(dx * dx + dy * dy);
-      const speed = 0.3;
+      const speed = 0.15;
       if (dist <= speed) {
         npc.x = npc.targetX;
         npc.y = npc.targetY;
@@ -430,7 +418,7 @@ function gameLoop(currentTime) {
   if (gameState === "playing" && !roomPopoverActive) {
     // Update logic (calls functions from gameLogic.js)
     updatePlayerPosition(player, keysPressed);
-    score += checkHeartCollection(player, hearts);
+    checkHeartCollection(player, hearts);
 
     if (hearts.length === 0 && ROOMS[currentRoomIndex].id === "coding_in_the_dark" && !codingDarkUnlocked) {
       codingDarkUnlocked = true;
