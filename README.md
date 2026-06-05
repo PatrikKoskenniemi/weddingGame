@@ -9,7 +9,7 @@ Det här är ett litet spel som vi har byggt till er. Ni ska live-koda spellogik
 1. Öppna en terminal i projektmappen
 2. Kör: `python3 -m http.server 8080`
 3. Öppna `http://localhost:8080` i Chrome
-4. Spara filen och tryck F5 för att ladda om efter ni ändrat koden
+4. Spara filen och tryck F5 (eller CMD + R) för att ladda om efter ni ändrat koden
 
 ## Er fil
 
