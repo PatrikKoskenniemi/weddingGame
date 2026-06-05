@@ -39,7 +39,11 @@ const SoundSystem = (() => {
       );
     },
 
-    play(key, { volume = 1, loop = false } = {}) {
+    resume() {
+      return getContext().resume().catch(() => {});
+    },
+
+    play(key, { volume = 1, loop = false, offset = 0, stopOffset = null } = {}) {
       const ctx = getContext();
       if (!buffers[key]) return null;
       if (ctx.state === "suspended") ctx.resume();
@@ -57,7 +61,11 @@ const SoundSystem = (() => {
         source.connect(ctx.destination);
       }
 
-      source.start(0);
+      if (stopOffset !== null) {
+        source.start(0, offset, stopOffset - offset);
+      } else {
+        source.start(0, offset);
+      }
       return source; // caller can call source.stop() to cancel looping sounds
     },
   };

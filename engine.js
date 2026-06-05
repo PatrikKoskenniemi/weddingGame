@@ -58,6 +58,9 @@ let emergencyExitTimeout = null;
 let dissolveSoundSource = null;
 let startScreenSoundSource = null;
 let timeMachineSoundSource = null;
+let aisleRoomMusicSource = null;
+let danceRoomMusicSource = null;
+let danceRoomMusicStarted = false;
 
 function spawnHearts(count) {
   const margin = 40;
@@ -178,8 +181,13 @@ async function loadRoom(roomIndex, showPopover = false) {
   roomBackgroundAbove = null;
   try { dissolveSoundSource?.stop(); } catch (_) {}
   try { timeMachineSoundSource?.stop(); } catch (_) {}
+  try { aisleRoomMusicSource?.stop(); } catch (_) {}
+  try { danceRoomMusicSource?.stop(); } catch (_) {}
   dissolveSoundSource = null;
   timeMachineSoundSource = null;
+  aisleRoomMusicSource = null;
+  danceRoomMusicSource = null;
+  danceRoomMusicStarted = false;
 
   const room = ROOMS[roomIndex];
   const mapData = await loadMap(room.map);
@@ -220,13 +228,17 @@ async function loadRoom(roomIndex, showPopover = false) {
       let walkAnim = "walk_down";
       if (Math.abs(dy) >= Math.abs(dx)) walkAnim = dy < 0 ? "walk_up" : "walk_down";
       else walkAnim = dx < 0 ? "walk_left" : "walk_right";
+      const startDelay = room.startDelay || 0;
+      const idleAnim = walkAnim.replace("walk_", "idle_");
       scriptedNpcs.push({
         x: start.x, y: start.y,
         targetX: end.x, targetY: end.y,
         size: 64,
-        sprite: createSpriteAnimation(cfg.spriteKey, walkAnim),
-        state: "walking",
+        sprite: createSpriteAnimation(cfg.spriteKey, idleAnim),
+        walkAnim,
+        state: startDelay > 0 ? "waiting" : "walking",
         stateElapsed: 0,
+        startDelay,
         turnDelay: cfg.turnDelay ?? 2500,
       });
     }
@@ -242,6 +254,15 @@ async function loadRoom(roomIndex, showPopover = false) {
       const key = npcKeys[i] || "npc1";
       pushables.push({ x: pos.x, y: pos.y, size: 64, sprite: createSpriteAnimation(key, "dance") });
     }
+  }
+
+  if (room.roomMusic?.aisle) {
+    const startDelay = room.startDelay || 0;
+    const am = room.roomMusic.aisle;
+    setTimeout(async () => {
+      await SoundSystem.resume();
+      aisleRoomMusicSource = SoundSystem.play(am.key, { offset: am.startOffset || 0, stopOffset: am.stopOffset ?? null });
+    }, startDelay);
   }
 
   gameState = "playing";
@@ -383,11 +404,18 @@ function checkRespawn() {
 // --- Scripted NPC Update ---
 function updateScriptedNpcs(deltaTime) {
   for (const npc of scriptedNpcs) {
-    if (npc.state === "walking") {
+    if (npc.state === "waiting") {
+      npc.stateElapsed += deltaTime;
+      if (npc.stateElapsed >= npc.startDelay) {
+        npc.state = "walking";
+        npc.stateElapsed = 0;
+        setSpriteAnimation(npc.sprite, npc.walkAnim);
+      }
+    } else if (npc.state === "walking") {
       const dx = npc.targetX - npc.x;
       const dy = npc.targetY - npc.y;
       const dist = Math.sqrt(dx * dx + dy * dy);
-      const speed = 0.15;
+      const speed = 0.10;
       if (dist <= speed) {
         npc.x = npc.targetX;
         npc.y = npc.targetY;
@@ -403,6 +431,13 @@ function updateScriptedNpcs(deltaTime) {
       if (npc.stateElapsed >= npc.turnDelay) {
         npc.state = "dancing";
         setSpriteAnimation(npc.sprite, "dance");
+        if (!danceRoomMusicStarted) {
+          danceRoomMusicStarted = true;
+          try { aisleRoomMusicSource?.stop(); } catch (_) {}
+          aisleRoomMusicSource = null;
+          const dm = ROOMS[currentRoomIndex].roomMusic?.dance;
+          if (dm) danceRoomMusicSource = SoundSystem.play(dm.key, { offset: dm.startOffset || 0, stopOffset: dm.stopOffset ?? null });
+        }
       }
     }
   }
@@ -523,6 +558,8 @@ const SOUNDS = {
   negativeAction: "assets/sounds/floraphonic-classic-game-action-negative-3-224421.mp3",
   timeMachineScreen: "assets/sounds/rescopicsound-cinematic-designed-sci-fi-whoosh-transition-nexawave-228295.mp3",
   startScreen: "assets/sounds/Sprite_spark.mp3",
+  weddingMarch: "assets/sounds/Wedding_March.mp3",
+  weddingBerlin: "assets/sounds/Wedding_in_Berlin.m4a",
 };
 
 const allLoads = [

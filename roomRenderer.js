@@ -94,15 +94,20 @@ const ROOMS = [
   {
     id: "wedding",
     map: "assets/maps/wedding.json",
-    year: "2026",
-    title: "Wedding",
+    year: "2026-06-13",
+    title: "Bröllop",
     door: { col: 15, row: 5, w: 1, h: 2 },
     spawn: { col: 2, row: 9 },
     hearts: false,
+    startDelay: 5000,
     aisleNpcs: [
-      { spriteKey: "npc1", start: { col: 7.1, row: 10 }, end: { col: 7.1, row: 4.3 }, turnDelay: 5000 },
-      { spriteKey: "npc2", start: { col: 7.9, row: 10 }, end: { col: 7.9, row: 4.3 }, turnDelay: 5000 },
+      { spriteKey: "npc1", start: { col: 7.1, row: 12 }, end: { col: 7.1, row: 4.3 }, turnDelay: 7200 },
+      { spriteKey: "npc2", start: { col: 7.9, row: 12 }, end: { col: 7.9, row: 4.3 }, turnDelay: 7200 },
     ],
+    roomMusic: {
+      aisle: { key: "weddingMarch",  startOffset: 0, stopOffset: null },
+      dance: { key: "weddingBerlin", startOffset: 123, stopOffset: null },
+    },
   },
 ];
 
