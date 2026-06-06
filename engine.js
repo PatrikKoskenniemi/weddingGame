@@ -229,12 +229,12 @@ async function loadRoom(roomIndex, showPopover = false) {
       if (Math.abs(dy) >= Math.abs(dx)) walkAnim = dy < 0 ? "walk_up" : "walk_down";
       else walkAnim = dx < 0 ? "walk_left" : "walk_right";
       const startDelay = room.startDelay || 0;
-      const idleAnim = walkAnim.replace("walk_", "idle_");
+      const initialAnim = startDelay > 0 ? walkAnim.replace("walk_", "idle_") : walkAnim;
       scriptedNpcs.push({
         x: start.x, y: start.y,
         targetX: end.x, targetY: end.y,
         size: 64,
-        sprite: createSpriteAnimation(cfg.spriteKey, idleAnim),
+        sprite: createSpriteAnimation(cfg.spriteKey, initialAnim),
         walkAnim,
         state: startDelay > 0 ? "waiting" : "walking",
         stateElapsed: 0,
@@ -436,7 +436,13 @@ function updateScriptedNpcs(deltaTime) {
           try { aisleRoomMusicSource?.stop(); } catch (_) {}
           aisleRoomMusicSource = null;
           const dm = ROOMS[currentRoomIndex].roomMusic?.dance;
-          if (dm) danceRoomMusicSource = SoundSystem.play(dm.key, { offset: dm.startOffset || 0, stopOffset: dm.stopOffset ?? null });
+          if (dm) {
+            const gap = dm.gapDelay || 0;
+            setTimeout(async () => {
+              await SoundSystem.resume();
+              danceRoomMusicSource = SoundSystem.play(dm.key, { offset: dm.startOffset || 0, stopOffset: dm.stopOffset ?? null });
+            }, gap);
+          }
         }
       }
     }
