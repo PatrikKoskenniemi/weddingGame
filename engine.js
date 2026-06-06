@@ -408,7 +408,7 @@ function updateScriptedNpcs(deltaTime) {
       const dx = npc.targetX - npc.x;
       const dy = npc.targetY - npc.y;
       const dist = Math.sqrt(dx * dx + dy * dy);
-      const speed = 2.10;
+      const speed = 0.10;
       if (dist <= speed) {
         npc.x = npc.targetX;
         npc.y = npc.targetY;
@@ -433,15 +433,16 @@ function updateScriptedNpcs(deltaTime) {
         triggerDanceMusic();
       }
     } else if (npc.state === "walkingBack") {
-      const dx = npc.startX - npc.x;
-      const dy = npc.startY - npc.y;
+      const dx = npc.walkBackTargetX - npc.x;
+      const dy = npc.walkBackTargetY - npc.y;
       const dist = Math.sqrt(dx * dx + dy * dy);
-      const speed = 0.10;
+      const speed = 1.50;
       if (dist <= speed) {
-        npc.x = npc.startX;
-        npc.y = npc.startY;
+        npc.x = npc.walkBackTargetX;
+        npc.y = npc.walkBackTargetY;
         npc.state = "dancing";
         setSpriteAnimation(npc.sprite, "dance");
+        triggerDanceMusic();
       } else {
         npc.x += (dx / dist) * speed;
         npc.y += (dy / dist) * speed;
@@ -494,8 +495,10 @@ function processCeremonyStep() {
   if (step.type === "walkBack") {
     for (const npc of scriptedNpcs) {
       npc.state = "walkingBack";
-      const dx = npc.startX - npc.x;
-      const dy = npc.startY - npc.y;
+      npc.walkBackTargetX = npc.x + (npc.startX - npc.x) * 0.3;
+      npc.walkBackTargetY = npc.y + (npc.startY - npc.y) * 0.3;
+      const dx = npc.walkBackTargetX - npc.x;
+      const dy = npc.walkBackTargetY - npc.y;
       let walkAnim = "walk_down";
       if (Math.abs(dy) >= Math.abs(dx)) walkAnim = dy < 0 ? "walk_up" : "walk_down";
       else walkAnim = dx < 0 ? "walk_left" : "walk_right";
@@ -585,7 +588,7 @@ function updateEmotes(deltaTime) {
 }
 
 function drawEmotes() {
-  const size = 40;
+  const size = 64;
   for (const emote of activeEmotes) {
     const bubbleY = emote.y + emote.offsetY;
     const tailY   = bubbleY + size;

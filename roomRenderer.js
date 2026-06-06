@@ -106,6 +106,7 @@ const ROOMS = [
     priest: { col: 7.5, row: 2.5 },
     ceremony: [
       { type: "faceEachOther" },
+      { type: "pause", duration: 1500 },
       { type: "emote", target: 0, emote: "question",     duration: 3500 },
       { type: "pause", duration: 500 },
       { type: "emote", target: 1, emote: "heart",        duration: 3000 },
@@ -119,8 +120,8 @@ const ROOMS = [
       { type: "walkBack" },
     ],
     roomMusic: {
-      aisle: { key: "weddingMarch",  startOffset: 0, stopOffset: null },
-      dance: { key: "weddingBerlin", startOffset: 123, stopOffset: null, gapDelay: 3000 },
+      aisle: { key: "weddingMarch",  startOffset: 0, stopOffset: 42 },
+      dance: { key: "weddingBerlin", startOffset: 61, stopOffset: null },
     },
   },
 ];
