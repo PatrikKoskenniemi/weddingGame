@@ -541,18 +541,24 @@ function updateCeremony(deltaTime) {
       let emoteX, emoteY, trackNpc, offsetY;
       if (step.target === "priest" && room.priest) {
         const pos = spawnToCanvas(room.priest);
-        emoteX = pos.x; emoteY = pos.y;
-        trackNpc = null; offsetY = -48;
+        emoteX = pos.x;
+        emoteY = pos.y;
+        trackNpc = null;
+        offsetY = -52;
       } else if (typeof step.target === "number" && scriptedNpcs[step.target]) {
         const npc = scriptedNpcs[step.target];
-        emoteX = npc.x; emoteY = npc.y;
-        trackNpc = step.target; offsetY = -80;
+        emoteX = npc.x;
+        emoteY = npc.y;
+        trackNpc = step.target;
+        offsetY = -80;
       }
       if (emoteX !== undefined) {
         activeEmotes.push({
           x: emoteX, y: emoteY,
           offsetY, trackNpc,
-          sprite: createSpriteAnimation("emote", step.emote),
+          spriteIcon:   createSpriteAnimation("emote", step.emote),
+          spriteBubble: createSpriteAnimation("emote", "bubble"),
+          spriteTail:   createSpriteAnimation("emote", "tail"),
           elapsed: 0,
           duration: step.duration,
         });
@@ -571,7 +577,9 @@ function updateEmotes(deltaTime) {
       emote.x = scriptedNpcs[emote.trackNpc].x;
       emote.y = scriptedNpcs[emote.trackNpc].y;
     }
-    updateSpriteAnimation(emote.sprite, deltaTime);
+    updateSpriteAnimation(emote.spriteIcon,   deltaTime);
+    updateSpriteAnimation(emote.spriteBubble, deltaTime);
+    updateSpriteAnimation(emote.spriteTail,   deltaTime);
   }
   activeEmotes = activeEmotes.filter(e => e.elapsed < e.duration);
 }
@@ -579,7 +587,11 @@ function updateEmotes(deltaTime) {
 function drawEmotes() {
   const size = 40;
   for (const emote of activeEmotes) {
-    drawSprite(ctx, emote.sprite, emote.x, emote.y + emote.offsetY, size, size, "#ffff00");
+    const bubbleY = emote.y + emote.offsetY;
+    const tailY   = bubbleY + size;
+    drawSprite(ctx, emote.spriteTail,   emote.x, tailY,   size, size, "#ffff00");
+    drawSprite(ctx, emote.spriteBubble, emote.x, bubbleY, size, size, "#ffffff");
+    drawSprite(ctx, emote.spriteIcon,   emote.x, bubbleY, size, size, "#ffff00");
   }
 }
 

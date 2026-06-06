@@ -91,7 +91,9 @@ const SPRITE_SHEETS = {
     animations: {
       exclamation: { row: 4, col: 0, frames: 2, speed: 500 },
       heart:       { row: 2, col: 4, frames: 2, speed: 500 },
-      question:    { row: 5, col: 2, frames: 2, speed: 500 },
+      question:    { row: 6, col: 2, frames: 2, speed: 500 },
+      bubble:      { row: 2, col: 0, frames: 4, speed: 300 },
+      tail:        { row: 3, col: 0, frames: 6, speed: 200 },
     },
   },
 };
