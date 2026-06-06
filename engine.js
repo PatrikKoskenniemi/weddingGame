@@ -228,17 +228,14 @@ async function loadRoom(roomIndex, showPopover = false) {
       let walkAnim = "walk_down";
       if (Math.abs(dy) >= Math.abs(dx)) walkAnim = dy < 0 ? "walk_up" : "walk_down";
       else walkAnim = dx < 0 ? "walk_left" : "walk_right";
-      const startDelay = room.startDelay || 0;
-      const initialAnim = startDelay > 0 ? walkAnim.replace("walk_", "idle_") : walkAnim;
       scriptedNpcs.push({
         x: start.x, y: start.y,
         targetX: end.x, targetY: end.y,
         size: 64,
-        sprite: createSpriteAnimation(cfg.spriteKey, initialAnim),
+        sprite: createSpriteAnimation(cfg.spriteKey, walkAnim),
         walkAnim,
-        state: startDelay > 0 ? "waiting" : "walking",
+        state: "walking",
         stateElapsed: 0,
-        startDelay,
         turnDelay: cfg.turnDelay ?? 2500,
       });
     }
@@ -257,12 +254,9 @@ async function loadRoom(roomIndex, showPopover = false) {
   }
 
   if (room.roomMusic?.aisle) {
-    const startDelay = room.startDelay || 0;
     const am = room.roomMusic.aisle;
-    setTimeout(async () => {
-      await SoundSystem.resume();
-      aisleRoomMusicSource = SoundSystem.play(am.key, { offset: am.startOffset || 0, stopOffset: am.stopOffset ?? null });
-    }, startDelay);
+    await SoundSystem.resume();
+    aisleRoomMusicSource = SoundSystem.play(am.key, { offset: am.startOffset || 0, stopOffset: am.stopOffset ?? null });
   }
 
   gameState = "playing";
@@ -404,14 +398,7 @@ function checkRespawn() {
 // --- Scripted NPC Update ---
 function updateScriptedNpcs(deltaTime) {
   for (const npc of scriptedNpcs) {
-    if (npc.state === "waiting") {
-      npc.stateElapsed += deltaTime;
-      if (npc.stateElapsed >= npc.startDelay) {
-        npc.state = "walking";
-        npc.stateElapsed = 0;
-        setSpriteAnimation(npc.sprite, npc.walkAnim);
-      }
-    } else if (npc.state === "walking") {
+    if (npc.state === "walking") {
       const dx = npc.targetX - npc.x;
       const dy = npc.targetY - npc.y;
       const dist = Math.sqrt(dx * dx + dy * dy);
