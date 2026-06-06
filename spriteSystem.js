@@ -84,6 +84,16 @@ const SPRITE_SHEETS = {
       pulse: { row: 1, col: 0, frames: 3, speed: 160, pingPong: true },
     },
   },
+  emote: {
+    src: "assets/sprites/UI_thinking_emotes_animation_16x16.png",
+    frameWidth: 16,
+    frameHeight: 16,
+    animations: {
+      exclamation: { row: 4, col: 0, frames: 2, speed: 500 },
+      heart:       { row: 2, col: 4, frames: 2, speed: 500 },
+      question:    { row: 5, col: 2, frames: 2, speed: 500 },
+    },
+  },
 };
 
 // --- Sprite Loader ---

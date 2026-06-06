@@ -61,6 +61,8 @@ let timeMachineSoundSource = null;
 let aisleRoomMusicSource = null;
 let danceRoomMusicSource = null;
 let danceRoomMusicStarted = false;
+let ceremony = null;
+let activeEmotes = [];
 
 function spawnHearts(count) {
   const margin = 40;
@@ -188,6 +190,8 @@ async function loadRoom(roomIndex, showPopover = false) {
   aisleRoomMusicSource = null;
   danceRoomMusicSource = null;
   danceRoomMusicStarted = false;
+  ceremony = null;
+  activeEmotes = [];
 
   const room = ROOMS[roomIndex];
   const mapData = await loadMap(room.map);
@@ -230,6 +234,7 @@ async function loadRoom(roomIndex, showPopover = false) {
       else walkAnim = dx < 0 ? "walk_left" : "walk_right";
       scriptedNpcs.push({
         x: start.x, y: start.y,
+        startX: start.x, startY: start.y,
         targetX: end.x, targetY: end.y,
         size: 64,
         sprite: createSpriteAnimation(cfg.spriteKey, walkAnim),
@@ -349,6 +354,7 @@ function render() {
   drawTargetMarkersOverlay();
   drawPushables();
   drawScriptedNpcs();
+  drawEmotes();
   if (trapdoor) {
     if (trapdoorAboveOverlay) {
       ctx.fillStyle = "#000000";
@@ -402,13 +408,19 @@ function updateScriptedNpcs(deltaTime) {
       const dx = npc.targetX - npc.x;
       const dy = npc.targetY - npc.y;
       const dist = Math.sqrt(dx * dx + dy * dy);
-      const speed = 0.10;
+      const speed = 2.10;
       if (dist <= speed) {
         npc.x = npc.targetX;
         npc.y = npc.targetY;
-        npc.state = "turned";
-        npc.stateElapsed = 0;
-        setSpriteAnimation(npc.sprite, "idle_down");
+        if (ROOMS[currentRoomIndex].ceremony) {
+          npc.state = "atAltar";
+          setSpriteAnimation(npc.sprite, "idle_down");
+          checkCeremonyStart();
+        } else {
+          npc.state = "turned";
+          npc.stateElapsed = 0;
+          setSpriteAnimation(npc.sprite, "idle_down");
+        }
       } else {
         npc.x += (dx / dist) * speed;
         npc.y += (dy / dist) * speed;
@@ -418,21 +430,156 @@ function updateScriptedNpcs(deltaTime) {
       if (npc.stateElapsed >= npc.turnDelay) {
         npc.state = "dancing";
         setSpriteAnimation(npc.sprite, "dance");
-        if (!danceRoomMusicStarted) {
-          danceRoomMusicStarted = true;
-          try { aisleRoomMusicSource?.stop(); } catch (_) {}
-          aisleRoomMusicSource = null;
-          const dm = ROOMS[currentRoomIndex].roomMusic?.dance;
-          if (dm) {
-            const gap = dm.gapDelay || 0;
-            setTimeout(async () => {
-              await SoundSystem.resume();
-              danceRoomMusicSource = SoundSystem.play(dm.key, { offset: dm.startOffset || 0, stopOffset: dm.stopOffset ?? null });
-            }, gap);
-          }
-        }
+        triggerDanceMusic();
+      }
+    } else if (npc.state === "walkingBack") {
+      const dx = npc.startX - npc.x;
+      const dy = npc.startY - npc.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      const speed = 0.10;
+      if (dist <= speed) {
+        npc.x = npc.startX;
+        npc.y = npc.startY;
+        npc.state = "dancing";
+        setSpriteAnimation(npc.sprite, "dance");
+      } else {
+        npc.x += (dx / dist) * speed;
+        npc.y += (dy / dist) * speed;
       }
     }
+  }
+  updateCeremony(deltaTime);
+}
+
+// --- Ceremony System ---
+
+function triggerDanceMusic() {
+  if (danceRoomMusicStarted) return;
+  danceRoomMusicStarted = true;
+  try { aisleRoomMusicSource?.stop(); } catch (_) {}
+  aisleRoomMusicSource = null;
+  const dm = ROOMS[currentRoomIndex].roomMusic?.dance;
+  if (dm) {
+    const gap = dm.gapDelay || 0;
+    setTimeout(async () => {
+      await SoundSystem.resume();
+      danceRoomMusicSource = SoundSystem.play(dm.key, { offset: dm.startOffset || 0, stopOffset: dm.stopOffset ?? null });
+    }, gap);
+  }
+}
+
+function checkCeremonyStart() {
+  if (ceremony !== null) return;
+  const allArrived = scriptedNpcs.length > 0 && scriptedNpcs.every(n => n.state === "atAltar");
+  if (allArrived) startCeremony();
+}
+
+function startCeremony() {
+  ceremony = { steps: ROOMS[currentRoomIndex].ceremony, stepIdx: 0, elapsed: 0, done: false };
+  processCeremonyStep();
+}
+
+function processCeremonyStep() {
+  if (!ceremony || ceremony.done) return;
+  ceremony.elapsed = 0;
+  const step = ceremony.steps[ceremony.stepIdx];
+
+  if (step.type === "faceEachOther") {
+    if (scriptedNpcs[0]) setSpriteAnimation(scriptedNpcs[0].sprite, "idle_right");
+    if (scriptedNpcs[1]) setSpriteAnimation(scriptedNpcs[1].sprite, "idle_left");
+    advanceCeremony();
+    return;
+  }
+
+  if (step.type === "walkBack") {
+    for (const npc of scriptedNpcs) {
+      npc.state = "walkingBack";
+      const dx = npc.startX - npc.x;
+      const dy = npc.startY - npc.y;
+      let walkAnim = "walk_down";
+      if (Math.abs(dy) >= Math.abs(dx)) walkAnim = dy < 0 ? "walk_up" : "walk_down";
+      else walkAnim = dx < 0 ? "walk_left" : "walk_right";
+      setSpriteAnimation(npc.sprite, walkAnim);
+    }
+    ceremony.done = true;
+    return;
+  }
+
+  // "emote" and "pause" steps are time-based and handled in updateCeremony
+}
+
+function advanceCeremony() {
+  if (!ceremony) return;
+  ceremony.stepIdx++;
+  if (ceremony.stepIdx >= ceremony.steps.length) {
+    ceremony.done = true;
+    triggerDance();
+    return;
+  }
+  processCeremonyStep();
+}
+
+function triggerDance() {
+  for (const npc of scriptedNpcs) {
+    if (npc.state === "atAltar") {
+      npc.state = "dancing";
+      setSpriteAnimation(npc.sprite, "dance");
+    }
+  }
+  triggerDanceMusic();
+}
+
+function updateCeremony(deltaTime) {
+  if (!ceremony || ceremony.done) return;
+
+  const step = ceremony.steps[ceremony.stepIdx];
+  ceremony.elapsed += deltaTime;
+
+  if (step.type === "emote") {
+    if (ceremony.elapsed <= deltaTime) {
+      const room = ROOMS[currentRoomIndex];
+      let emoteX, emoteY, trackNpc, offsetY;
+      if (step.target === "priest" && room.priest) {
+        const pos = spawnToCanvas(room.priest);
+        emoteX = pos.x; emoteY = pos.y;
+        trackNpc = null; offsetY = -48;
+      } else if (typeof step.target === "number" && scriptedNpcs[step.target]) {
+        const npc = scriptedNpcs[step.target];
+        emoteX = npc.x; emoteY = npc.y;
+        trackNpc = step.target; offsetY = -80;
+      }
+      if (emoteX !== undefined) {
+        activeEmotes.push({
+          x: emoteX, y: emoteY,
+          offsetY, trackNpc,
+          sprite: createSpriteAnimation("emote", step.emote),
+          elapsed: 0,
+          duration: step.duration,
+        });
+      }
+    }
+    if (ceremony.elapsed >= step.duration) advanceCeremony();
+  } else if (step.type === "pause") {
+    if (ceremony.elapsed >= step.duration) advanceCeremony();
+  }
+}
+
+function updateEmotes(deltaTime) {
+  for (const emote of activeEmotes) {
+    emote.elapsed += deltaTime;
+    if (emote.trackNpc !== null && scriptedNpcs[emote.trackNpc]) {
+      emote.x = scriptedNpcs[emote.trackNpc].x;
+      emote.y = scriptedNpcs[emote.trackNpc].y;
+    }
+    updateSpriteAnimation(emote.sprite, deltaTime);
+  }
+  activeEmotes = activeEmotes.filter(e => e.elapsed < e.duration);
+}
+
+function drawEmotes() {
+  const size = 40;
+  for (const emote of activeEmotes) {
+    drawSprite(ctx, emote.sprite, emote.x, emote.y + emote.offsetY, size, size, "#ffff00");
   }
 }
 
@@ -513,6 +660,7 @@ function gameLoop(currentTime) {
   for (const npc of scriptedNpcs) {
     updateSpriteAnimation(npc.sprite, deltaTime);
   }
+  updateEmotes(deltaTime);
   if (trapdoor) updateSpriteAnimation(trapdoor.sprite, deltaTime);
   if (emergencyExit) updateSpriteAnimation(emergencyExit.sprite, deltaTime);
 
