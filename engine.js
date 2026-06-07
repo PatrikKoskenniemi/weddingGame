@@ -388,7 +388,7 @@ function render() {
     const litSpots = room.targets
       ? room.targets
           .map(t => spawnToCanvas(t))
-          .filter(tc => pushables.some(p => Math.abs(p.x - tc.x) < 55 && Math.abs(p.y - tc.y) < 55))
+          .filter(tc => pushables.some(p => Math.abs(p.x - tc.x) < 55 && Math.abs((p.y + p.size/2) - tc.y) < 55))
       : [];
     drawDiscoOverlay(ctx, litSpots);
     drawPustervikSign(ctx);
@@ -662,7 +662,7 @@ function gameLoop(currentTime) {
       const room = ROOMS[currentRoomIndex];
       roomDoorUnlocked = room.targets.every(t => {
         const tc = spawnToCanvas(t);
-        return pushables.some(p => Math.abs(p.x - tc.x) < 55 && Math.abs(p.y - tc.y) < 55);
+        return pushables.some(p => Math.abs(p.x - tc.x) < 55 && Math.abs((p.y + p.size/2) - tc.y) < 55);
       });
       if (emergencyExit) {
         if (roomDoorUnlocked && emergencyExit.sprite.currentAnim === "closed") {
