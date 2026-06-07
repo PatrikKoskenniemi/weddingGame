@@ -440,12 +440,19 @@ function updateScriptedNpcs(deltaTime) {
       if (dist <= speed) {
         npc.x = npc.walkBackTargetX;
         npc.y = npc.walkBackTargetY;
-        npc.state = "dancing";
-        setSpriteAnimation(npc.sprite, "dance");
+        npc.state = "idleBeforeDance";
+        npc.stateElapsed = 0;
+        setSpriteAnimation(npc.sprite, "idle_down");
         triggerDanceMusic();
       } else {
         npc.x += (dx / dist) * speed;
         npc.y += (dy / dist) * speed;
+      }
+    } else if (npc.state === "idleBeforeDance") {
+      npc.stateElapsed += deltaTime;
+      if (npc.stateElapsed >= 4000) {
+        npc.state = "dancing";
+        setSpriteAnimation(npc.sprite, "dance");
       }
     }
   }
@@ -495,8 +502,8 @@ function processCeremonyStep() {
   if (step.type === "walkBack") {
     for (const npc of scriptedNpcs) {
       npc.state = "walkingBack";
-      npc.walkBackTargetX = npc.x + (npc.startX - npc.x) * 0.35;
-      npc.walkBackTargetY = npc.y + (npc.startY - npc.y) * 0.35;
+      npc.walkBackTargetX = npc.x + (npc.startX - npc.x) * 0.40;
+      npc.walkBackTargetY = npc.y + (npc.startY - npc.y) * 0.40;
       const dx = npc.walkBackTargetX - npc.x;
       const dy = npc.walkBackTargetY - npc.y;
       let walkAnim = "walk_down";

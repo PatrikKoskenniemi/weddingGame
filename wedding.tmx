@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.12.1" orientation="orthogonal" renderorder="right-down" width="16" height="12" tilewidth="16" tileheight="16" infinite="1" nextlayerid="35" nextobjectid="9">
+<map version="1.10" tiledversion="1.12.1" orientation="orthogonal" renderorder="right-down" width="16" height="12" tilewidth="16" tileheight="16" infinite="1" nextlayerid="35" nextobjectid="10">
  <editorsettings>
   <export target="assets/maps/wedding.json" format="json"/>
  </editorsettings>
@@ -4924,6 +4924,7 @@
  </tileset>
  <tileset firstgid="4242" source="assets/tilesets/icons_char_wedding.tsx"/>
  <tileset firstgid="8400" source="assets/tilesets/Room_Builder_16x16.tsx"/>
+ <tileset firstgid="16988" source="assets/tilesets/images.tsx"/>
  <layer id="5" name="Floor1" width="16" height="12">
   <data encoding="csv">
    <chunk x="0" y="0" width="16" height="16">
@@ -5056,6 +5057,17 @@
 </chunk>
   </data>
  </layer>
+ <objectgroup id="27" name="Icons">
+  <object id="1" gid="4297" x="79" y="50" width="11" height="12"/>
+  <object id="2" gid="4298" x="166" y="50" width="12" height="12"/>
+  <object id="3" gid="8400" x="127" y="36" width="16" height="16"/>
+  <object id="4" gid="8400" x="129" y="37" width="16" height="16"/>
+ </objectgroup>
+ <objectgroup id="28" name="IconsBackground">
+  <object id="7" gid="4299" x="79" y="51" width="16" height="14"/>
+  <object id="8" gid="4299" x="166" y="51" width="16" height="14"/>
+  <object id="9" gid="16994" x="109" y="52" width="38" height="41"/>
+ </objectgroup>
  <layer id="26" name="Priest" width="16" height="12">
   <data encoding="csv">
    <chunk x="0" y="0" width="16" height="16">
@@ -5122,16 +5134,6 @@
 </chunk>
   </data>
  </layer>
- <objectgroup id="27" name="Icons">
-  <object id="1" gid="4297" x="79" y="50" width="11" height="12"/>
-  <object id="2" gid="4298" x="166" y="50" width="12" height="12"/>
-  <object id="3" gid="8400" x="127" y="36" width="16" height="16"/>
-  <object id="4" gid="8400" x="129" y="37" width="16" height="16"/>
- </objectgroup>
- <objectgroup id="28" name="IconsBackground">
-  <object id="7" gid="4299" x="79" y="51" width="16" height="14"/>
-  <object id="8" gid="4299" x="166" y="51" width="16" height="14"/>
- </objectgroup>
  <layer id="17" name="benches" width="16" height="12">
   <data encoding="csv">
    <chunk x="0" y="0" width="16" height="16">

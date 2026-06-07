@@ -219,6 +219,119 @@
          "y":0
         }, 
         {
+         "draworder":"topdown",
+         "id":27,
+         "name":"Icons",
+         "objects":[
+                {
+                 "gid":4297,
+                 "height":12,
+                 "id":1,
+                 "name":"",
+                 "opacity":1,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":11,
+                 "x":79,
+                 "y":50
+                }, 
+                {
+                 "gid":4298,
+                 "height":12,
+                 "id":2,
+                 "name":"",
+                 "opacity":1,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":12,
+                 "x":166,
+                 "y":50
+                }, 
+                {
+                 "gid":8400,
+                 "height":16,
+                 "id":3,
+                 "name":"",
+                 "opacity":1,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":127,
+                 "y":36
+                }, 
+                {
+                 "gid":8400,
+                 "height":16,
+                 "id":4,
+                 "name":"",
+                 "opacity":1,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":129,
+                 "y":37
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "draworder":"topdown",
+         "id":28,
+         "name":"IconsBackground",
+         "objects":[
+                {
+                 "gid":4299,
+                 "height":14,
+                 "id":7,
+                 "name":"",
+                 "opacity":1,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":79,
+                 "y":51
+                }, 
+                {
+                 "gid":4299,
+                 "height":14,
+                 "id":8,
+                 "name":"",
+                 "opacity":1,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":166,
+                 "y":51
+                }, 
+                {
+                 "gid":16994,
+                 "height":41,
+                 "id":9,
+                 "name":"",
+                 "opacity":1,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":38,
+                 "x":109,
+                 "y":52
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
+        }, 
+        {
          "chunks":[
                 {
                  "data":[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -323,106 +436,6 @@
          "type":"tilelayer",
          "visible":true,
          "width":32,
-         "x":0,
-         "y":0
-        }, 
-        {
-         "draworder":"topdown",
-         "id":27,
-         "name":"Icons",
-         "objects":[
-                {
-                 "gid":4297,
-                 "height":12,
-                 "id":1,
-                 "name":"",
-                 "opacity":1,
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":11,
-                 "x":79,
-                 "y":50
-                }, 
-                {
-                 "gid":4298,
-                 "height":12,
-                 "id":2,
-                 "name":"",
-                 "opacity":1,
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":12,
-                 "x":166,
-                 "y":50
-                }, 
-                {
-                 "gid":8400,
-                 "height":16,
-                 "id":3,
-                 "name":"",
-                 "opacity":1,
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":16,
-                 "x":127,
-                 "y":36
-                }, 
-                {
-                 "gid":8400,
-                 "height":16,
-                 "id":4,
-                 "name":"",
-                 "opacity":1,
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":16,
-                 "x":129,
-                 "y":37
-                }],
-         "opacity":1,
-         "type":"objectgroup",
-         "visible":true,
-         "x":0,
-         "y":0
-        }, 
-        {
-         "draworder":"topdown",
-         "id":28,
-         "name":"IconsBackground",
-         "objects":[
-                {
-                 "gid":4299,
-                 "height":14,
-                 "id":7,
-                 "name":"",
-                 "opacity":1,
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":16,
-                 "x":79,
-                 "y":51
-                }, 
-                {
-                 "gid":4299,
-                 "height":14,
-                 "id":8,
-                 "name":"",
-                 "opacity":1,
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":16,
-                 "x":166,
-                 "y":51
-                }],
-         "opacity":1,
-         "type":"objectgroup",
-         "visible":true,
          "x":0,
          "y":0
         }, 
@@ -730,7 +743,7 @@
          "y":0
         }],
  "nextlayerid":35,
- "nextobjectid":9,
+ "nextobjectid":10,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.12.1",
@@ -16420,6 +16433,10 @@
         {
          "firstgid":8400,
          "source":"..\/tilesets\/Room_Builder_16x16.tsx"
+        }, 
+        {
+         "firstgid":16988,
+         "source":"..\/tilesets\/images.tsx"
         }],
  "tilewidth":16,
  "type":"map",
