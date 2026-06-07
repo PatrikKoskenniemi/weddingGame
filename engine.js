@@ -565,6 +565,7 @@ function updateCeremony(deltaTime) {
           elapsed: 0,
           duration: step.duration,
         });
+        if (step.sound) SoundSystem.play(step.sound);
       }
     }
     if (ceremony.elapsed >= step.duration) advanceCeremony();
@@ -711,11 +712,16 @@ function gameLoop(currentTime) {
 // --- Start ---
 // Preload sprite sheets + tileset images, then load first room and start
 const SOUNDS = {
-  negativeAction: "assets/sounds/floraphonic-classic-game-action-negative-3-224421.mp3",
-  timeMachineScreen: "assets/sounds/rescopicsound-cinematic-designed-sci-fi-whoosh-transition-nexawave-228295.mp3",
-  startScreen: "assets/sounds/Sprite_spark.mp3",
-  weddingMarch: "assets/sounds/Wedding_March.mp3",
-  weddingBerlin: "assets/sounds/Wedding_in_Berlin.m4a",
+  negativeAction:      "assets/sounds/floraphonic-classic-game-action-negative-3-224421.mp3",
+  timeMachineScreen:   "assets/sounds/rescopicsound-cinematic-designed-sci-fi-whoosh-transition-nexawave-228295.mp3",
+  startScreen:         "assets/sounds/Sprite_spark.mp3",
+  weddingMarch:        "assets/sounds/Wedding_March.mp3",
+  weddingBerlin:       "assets/sounds/Wedding_in_Berlin.m4a",
+  malegrunt:           "assets/sounds/malegrunt_full-99410.mp3",
+  femalegrunt1:        "assets/sounds/femalegrunt1-99412.mp3",
+  femalegrunt2:        "assets/sounds/femalegrunt2-45733.mp3",
+  malegrunt2:          "assets/sounds/malegrunt2-45729.mp3",
+  maledeepgrunt:       "assets/sounds/maledeepgrunt_full-99411.mp3",
 };
 
 const allLoads = [
