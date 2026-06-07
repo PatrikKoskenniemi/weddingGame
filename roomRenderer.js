@@ -25,6 +25,7 @@ const ROOMS = [
     year: "2015",
     title: "På Lokal",
     door: { col: 8.5, row: 1, w: 1, h: 2.5 },
+    doorArrow: { col: 8.6, row: 1.4, requiresUnlock: true },
     spawn: { col: 5, row: 9 },
     hearts: false,
     pushables: [
@@ -75,6 +76,7 @@ const ROOMS = [
     spawn: { col: 2.5, row: 6.5 },
     hearts: true,
     showTitle: false,
+    doorArrow: { col: 13.45, row: 8.9, requiresUnlock: true },
     popover: {
       title: "Stockholm - 2016???",
       lines: [

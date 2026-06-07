@@ -84,6 +84,14 @@ const SPRITE_SHEETS = {
       pulse: { row: 1, col: 0, frames: 3, speed: 160, pingPong: true },
     },
   },
+  ui: {
+    src: "assets/sprites/UI_16x16.png",
+    frameWidth: 16,
+    frameHeight: 16,
+    animations: {
+      pointing_arrow_down: { row: 11, col: 8, frames: 6, speed: 120 },
+    },
+  },
   emote: {
     src: "assets/sprites/UI_thinking_emotes_animation_16x16.png",
     frameWidth: 16,

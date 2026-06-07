@@ -54,6 +54,7 @@ let trapdoorAboveOverlay = false;
 let roomPopoverActive = false;
 let trapdoor = null;
 let emergencyExit = null;
+let doorArrow = null;
 let emergencyExitTimeout = null;
 let dissolveSoundSource = null;
 let startScreenSoundSource = null;
@@ -222,6 +223,13 @@ async function loadRoom(roomIndex, showPopover = false) {
   trapdoor = room.id === "coding_in_the_dark"
     ? { sprite: createSpriteAnimation("trapdoor", "closed"), ...spawnToCanvas({ col: 13.5, row: 10 }) }
     : null;
+  if (room.doorArrow) {
+    doorArrow = { sprite: createSpriteAnimation("ui", "pointing_arrow_down"), ...spawnToCanvas(room.doorArrow), requiresUnlock: room.doorArrow.requiresUnlock || false };
+  } else if (room.door) {
+    doorArrow = { sprite: createSpriteAnimation("ui", "pointing_arrow_down"), ...spawnToCanvas({ col: room.door.col + room.door.w / 2 - 1, row: room.door.row - 0.25 }), requiresUnlock: false };
+  } else {
+    doorArrow = null;
+  }
   clearTimeout(emergencyExitTimeout);
   emergencyExitTimeout = null;
   emergencyExit = room.id === "single_life"
@@ -371,6 +379,7 @@ function render() {
     }
     drawSprite(ctx, trapdoor.sprite, trapdoor.x, trapdoor.y, T * S, T * S, "#553300");
   }
+  if (doorArrow && (!doorArrow.requiresUnlock || roomDoorUnlocked || codingDarkUnlocked)) drawSprite(ctx, doorArrow.sprite, doorArrow.x, doorArrow.y, T * S, T * S, "#ffffff");
   drawPlayer();
   if (ROOMS[currentRoomIndex].id === "coding_in_the_dark") {
     drawSpotlightOverlay(ctx, player, codingDarkUnlocked, trapdoorAboveOverlay ? trapdoor : null);
@@ -705,6 +714,7 @@ function gameLoop(currentTime) {
   }
   updateEmotes(deltaTime);
   if (trapdoor) updateSpriteAnimation(trapdoor.sprite, deltaTime);
+  if (doorArrow) updateSpriteAnimation(doorArrow.sprite, deltaTime);
   if (emergencyExit) updateSpriteAnimation(emergencyExit.sprite, deltaTime);
 
   if (gameState === "intro") introElapsed += deltaTime;
