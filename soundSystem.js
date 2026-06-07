@@ -43,7 +43,7 @@ const SoundSystem = (() => {
       return getContext().resume().catch(() => {});
     },
 
-    play(key, { volume = 1, loop = false, offset = 0, stopOffset = null } = {}) {
+    play(key, { volume = 1, loop = false, offset = 0, stopOffset = null, fadeOutMs = 0 } = {}) {
       const ctx = getContext();
       if (!buffers[key]) return null;
       if (ctx.state === "suspended") ctx.resume();
@@ -52,21 +52,48 @@ const SoundSystem = (() => {
       source.buffer = buffers[key];
       source.loop = loop;
 
-      if (volume !== 1) {
-        const gain = ctx.createGain();
-        gain.gain.value = volume;
-        source.connect(gain);
-        gain.connect(ctx.destination);
-      } else {
-        source.connect(ctx.destination);
-      }
+      const gain = ctx.createGain();
+      gain.gain.value = volume;
+      source.connect(gain);
+      gain.connect(ctx.destination);
 
       if (stopOffset !== null) {
         source.start(0, offset, stopOffset - offset);
       } else {
         source.start(0, offset);
       }
-      return source; // caller can call source.stop() to cancel looping sounds
+
+      let fading = false;
+      let scheduledFadeTimer = null;
+
+      const doFade = (durationMs) => {
+        if (fading) return;
+        fading = true;
+        clearTimeout(scheduledFadeTimer);
+        const steps = 30;
+        const stepMs = durationMs / steps;
+        let step = 0;
+        const timer = setInterval(() => {
+          step++;
+          gain.gain.value = Math.max(0, 1 - step / steps);
+          if (step >= steps) {
+            clearInterval(timer);
+            try { source.stop(); } catch (_) {}
+          }
+        }, stepMs);
+      };
+
+      if (stopOffset !== null && fadeOutMs > 0) {
+        const fadeStartMs = (stopOffset - offset) * 1000 - fadeOutMs;
+        if (fadeStartMs > 0) {
+          scheduledFadeTimer = setTimeout(() => doFade(fadeOutMs), fadeStartMs);
+        }
+      }
+
+      return {
+        stop()              { clearTimeout(scheduledFadeTimer); try { source.stop(); } catch (_) {} },
+        fadeOut(durationMs) { doFade(durationMs); },
+      };
     },
   };
 })();

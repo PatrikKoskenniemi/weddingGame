@@ -261,7 +261,7 @@ async function loadRoom(roomIndex, showPopover = false) {
   if (room.roomMusic?.aisle) {
     const am = room.roomMusic.aisle;
     await SoundSystem.resume();
-    aisleRoomMusicSource = SoundSystem.play(am.key, { offset: am.startOffset || 0, stopOffset: am.stopOffset ?? null });
+    aisleRoomMusicSource = SoundSystem.play(am.key, { offset: am.startOffset || 0, stopOffset: am.stopOffset ?? null, fadeOutMs: am.fadeOutMs || 0 });
   }
 
   gameState = "playing";
@@ -436,7 +436,7 @@ function updateScriptedNpcs(deltaTime) {
       const dx = npc.walkBackTargetX - npc.x;
       const dy = npc.walkBackTargetY - npc.y;
       const dist = Math.sqrt(dx * dx + dy * dy);
-      const speed = 1.50;
+      const speed = 1.00;
       if (dist <= speed) {
         npc.x = npc.walkBackTargetX;
         npc.y = npc.walkBackTargetY;
@@ -457,7 +457,7 @@ function updateScriptedNpcs(deltaTime) {
 function triggerDanceMusic() {
   if (danceRoomMusicStarted) return;
   danceRoomMusicStarted = true;
-  try { aisleRoomMusicSource?.stop(); } catch (_) {}
+  aisleRoomMusicSource?.fadeOut(2000);
   aisleRoomMusicSource = null;
   const dm = ROOMS[currentRoomIndex].roomMusic?.dance;
   if (dm) {
@@ -495,8 +495,8 @@ function processCeremonyStep() {
   if (step.type === "walkBack") {
     for (const npc of scriptedNpcs) {
       npc.state = "walkingBack";
-      npc.walkBackTargetX = npc.x + (npc.startX - npc.x) * 0.3;
-      npc.walkBackTargetY = npc.y + (npc.startY - npc.y) * 0.3;
+      npc.walkBackTargetX = npc.x + (npc.startX - npc.x) * 0.35;
+      npc.walkBackTargetY = npc.y + (npc.startY - npc.y) * 0.35;
       const dx = npc.walkBackTargetX - npc.x;
       const dy = npc.walkBackTargetY - npc.y;
       let walkAnim = "walk_down";

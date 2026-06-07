@@ -120,7 +120,7 @@ const ROOMS = [
       { type: "walkBack" },
     ],
     roomMusic: {
-      aisle: { key: "weddingMarch",  startOffset: 0, stopOffset: 42 },
+      aisle: { key: "weddingMarch",  startOffset: 0, stopOffset: 42, fadeOutMs: 3000 },
       dance: { key: "weddingBerlin", startOffset: 61, stopOffset: null },
     },
   },
