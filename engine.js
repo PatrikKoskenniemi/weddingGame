@@ -63,6 +63,8 @@ let danceRoomMusicSource = null;
 let danceRoomMusicStarted = false;
 let ceremony = null;
 let activeEmotes = [];
+let levelCompleteElapsed = 0;
+let weddingCompleteTimeout = null;
 
 function spawnHearts(count) {
   const margin = 40;
@@ -147,7 +149,11 @@ window.addEventListener("keydown", (e) => {
     }
   } else if (gameState === "levelComplete" || gameState === "timeMachine") {
     if (e.key === " ") {
-      advanceToNextRoom();
+      if (gameState === "levelComplete" && ROOMS[currentRoomIndex].id === "wedding") {
+        gameState = "playing";
+      } else {
+        advanceToNextRoom();
+      }
       e.preventDefault();
     }
   }
@@ -192,6 +198,8 @@ async function loadRoom(roomIndex, showPopover = false) {
   danceRoomMusicStarted = false;
   ceremony = null;
   activeEmotes = [];
+  clearTimeout(weddingCompleteTimeout);
+  weddingCompleteTimeout = null;
 
   const room = ROOMS[roomIndex];
   const mapData = await loadMap(room.map);
@@ -272,8 +280,9 @@ function advanceToNextRoom() {
   if (nextIndex < ROOMS.length) {
     loadRoom(nextIndex, true);
   } else {
-    // Last room — stay on level complete screen
+    // Last room — replay credits
     gameState = "levelComplete";
+    levelCompleteElapsed = 0;
   }
 }
 
@@ -387,7 +396,11 @@ function render() {
     drawRoomPopover(ctx, ROOMS[currentRoomIndex].popover);
   }
   if (gameState === "levelComplete") {
-    drawLevelComplete(ctx, ROOMS[currentRoomIndex]);
+    if (ROOMS[currentRoomIndex].id === "wedding") {
+      drawWeddingComplete(ctx, levelCompleteElapsed);
+    } else {
+      drawLevelComplete(ctx, ROOMS[currentRoomIndex]);
+    }
   }
   if (gameState === "timeMachine") {
     drawTimeMachineScreen(ctx, timeMachineElapsed);
@@ -453,6 +466,12 @@ function updateScriptedNpcs(deltaTime) {
       if (npc.stateElapsed >= 4000) {
         npc.state = "dancing";
         setSpriteAnimation(npc.sprite, "dance");
+        if (ROOMS[currentRoomIndex].id === "wedding" && !weddingCompleteTimeout) {
+          weddingCompleteTimeout = setTimeout(() => {
+            gameState = "levelComplete";
+            levelCompleteElapsed = 0;
+          }, 7000);
+        }
       }
     }
   }
@@ -658,6 +677,7 @@ function gameLoop(currentTime) {
         dissolveSoundSource = SoundSystem.play("negativeAction");
       } else {
         gameState = "levelComplete";
+        levelCompleteElapsed = 0;
       }
     }
 
@@ -688,6 +708,7 @@ function gameLoop(currentTime) {
   if (emergencyExit) updateSpriteAnimation(emergencyExit.sprite, deltaTime);
 
   if (gameState === "intro") introElapsed += deltaTime;
+  if (gameState === "levelComplete") levelCompleteElapsed += deltaTime;
   if (gameState === "dissolving") {
     dissolveElapsed += deltaTime;
     if (dissolveElapsed >= DISSOLVE_DURATION) {

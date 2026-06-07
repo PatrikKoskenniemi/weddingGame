@@ -96,7 +96,6 @@ const ROOMS = [
     map: "assets/maps/wedding.json",
     year: "2026-06-13",
     title: "Bröllop",
-    door: { col: 15, row: 5, w: 1, h: 2 },
     spawn: { col: 6, row: 4.6 },
     hearts: false,
     aisleNpcs: [
@@ -751,6 +750,67 @@ function drawSpotlightOverlay(targetCtx, player, unlocked, trapdoorSpot = null) 
 }
 
 // --- Level Complete Overlay ---
+
+// --- Wedding Complete (scrolling credits) ---
+
+function drawWeddingComplete(targetCtx, elapsed) {
+  const fadeAlpha = Math.min(0.66, (elapsed / 600) * 0.66);
+  targetCtx.fillStyle = `rgba(0,0,0,${fadeAlpha})`;
+  targetCtx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+  const cx = CANVAS_WIDTH / 2;
+  const startDelay = 1200;
+  const lineH = 48;
+
+  const items = [
+    { text: "Game Completed!",                                        font: "bold 60px monospace",   color: "#f0e040", h: 80 },
+    { text: null,                                                                                                       h: 56 },
+    { text: "Gustav och Elina gifter sig den 13 juni 2026",           font: "28px monospace",        color: "#ffffff", h: lineH },
+    { text: "omgivna av vänner och familj. Annie står bara",          font: "28px monospace",        color: "#ffffff", h: lineH },
+    { text: "bredvid och ler, hon har räddat sin familj.",             font: "28px monospace",        color: "#ffffff", h: lineH },
+    { text: null,                                                                                                       h: 40 },
+    { text: "Och så de levde lyckliga i alla sina dar...",            font: "italic 32px monospace", color: "#ffffff", h: lineH + 8 },
+    { text: null,                                                                                                       h: 72 },
+    { text: null,                                                                                                       h: 72 },
+    { text: "Stort grattis på er bröllopsdag!",                       font: "bold 44px monospace",   color: "#f0e040", h: 60 },
+  ];
+
+  const totalContentH = items.reduce((sum, item) => sum + item.h, 0);
+  const targetStartY = Math.max(60, (CANVAS_HEIGHT - totalContentH) / 2);
+  const maxScroll = CANVAS_HEIGHT + 60 - targetStartY;
+  const scroll = Math.min(maxScroll, Math.max(0, (elapsed - startDelay) * 0.065));
+
+  let y = CANVAS_HEIGHT + 60 - scroll;
+
+  targetCtx.save();
+  targetCtx.textAlign = "center";
+  targetCtx.textBaseline = "middle";
+  targetCtx.beginPath();
+  targetCtx.rect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+  targetCtx.clip();
+
+  const contentAlpha = Math.min(1, elapsed / 400);
+
+  for (const item of items) {
+    if (item.text) {
+      targetCtx.globalAlpha = contentAlpha;
+      targetCtx.font = item.font;
+      targetCtx.fillStyle = item.color;
+      targetCtx.fillText(item.text, cx, y + item.h / 2);
+    }
+    y += item.h;
+  }
+
+  if (scroll >= maxScroll) {
+    const blink = Math.floor(elapsed / 600) % 2 === 0 ? 0.6 : 0.25;
+    targetCtx.globalAlpha = blink;
+    targetCtx.font = "20px monospace";
+    targetCtx.fillStyle = "#ffffff";
+    targetCtx.fillText("Press space to close", cx, CANVAS_HEIGHT - 24);
+  }
+
+  targetCtx.restore();
+}
 
 // --- Dissolve Transition ---
 
