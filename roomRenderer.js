@@ -40,7 +40,7 @@ const ROOMS = [
       title: "På lokal",
       lines: [
         "Annie har landat i 2015.",
-        "En tid av Yrgo och praktikplatser,",
+        "En tid präglat av Yrgo och praktikplatser,",
         "pingisbord på nattklubbarna",
         "och alldeles för många #TBT Instagram-poster",
         "",
@@ -58,19 +58,23 @@ const ROOMS = [
       ],
     },
     completeLines: [
-      "Gustav och Elina spelar sin pingis-match och dom börjar dejta.",
-      "Det går bra till en början",
-      "och Annie börjar undra varför hon bara är 2 år gammal",
+      "",
+      "Gustav och Elina avslutar sin pingis-match med vuxengos.",
+      "Och dom börjar dejta!",
+      "Det går bra till en början av dejtandet",
+      "och Annie börjar undra varför hon bara är 2 år gammal.",
       "Men så händer något och mitt framför ögonen på Annie",
-      "och plötsligt tar relationen.",
-      "Vår hjältinna tvekar dock inte och kastar sig rakt in i nästa portal.",
+      "och plötsligt tar relationen abrupt slut.",
+      "Vår hjältinna tvekar dock inte,",
+      "hon kastar sig rakt in i nästa portal.",
+      "",
       " \"Detta måste gå!\"",
     ],
   },
   {
     id: "coding_in_the_dark",
     map: "assets/maps/coding_in_the_dark.json",
-    year: "",
+    year: "2016",
     title: "Code in the Dark",
     door: { col: 13.5, row: 10, w: 2, h: 6 },
     spawn: { col: 2.5, row: 6.5 },
@@ -92,6 +96,20 @@ const ROOMS = [
       ],
       height: 470
     },
+    completeLines: [
+      "",
+      "Musiken dunkar.",
+      "Mekaniska tangentbord ekrar i lokalen.",
+      "Publiken stirrar på skärmarna.",
+      "",
+      "Men Gustav och Elina stirrar inte på skärmarna.",
+      "",
+      "Dom stirrar på varandra.",
+      "",
+      "Annie smiter diskret genom en lucka i golvet.",
+      "",
+      "\"Detta måste ha fungerat.\"",
+    ],
   },
   {
     id: "wedding",
@@ -947,14 +965,14 @@ function drawLevelComplete(targetCtx, roomInfo) {
   // "Level Complete!" — large
   targetCtx.font = "bold 52px monospace";
   targetCtx.fillStyle = "rgba(0,0,0,0.4)";
-  targetCtx.fillText("Level Complete!", cx + 3, cy - 180 + 3);
+  targetCtx.fillText("Level Complete!", cx + 3, cy - 200 + 3);
   targetCtx.fillStyle = "#ffd700";
-  targetCtx.fillText("Level Complete!", cx, cy - 180);
+  targetCtx.fillText("Level Complete!", cx, cy - 200);
 
   // Room title — gap below "Level Complete!"
   targetCtx.font = "bold 28px monospace";
   targetCtx.fillStyle = "#fff";
-  targetCtx.fillText(roomInfo.year + " — " + roomInfo.title, cx, cy - 80);
+  targetCtx.fillText(roomInfo.year + " — " + roomInfo.title, cx, cy - 110);
 
   // Optional extra lines from room config
   const extraLines = roomInfo.completeLines || [];
@@ -962,11 +980,11 @@ function drawLevelComplete(targetCtx, roomInfo) {
   targetCtx.font = "28px monospace";
   targetCtx.fillStyle = "rgba(255,255,255,0.85)";
   for (let i = 0; i < extraLines.length; i++) {
-    targetCtx.fillText(extraLines[i], cx, cy - 30 + i * lineH);
+    targetCtx.fillText(extraLines[i], cx, cy - 80 + i * lineH);
   }
 
   // "Press space" — pushed down to clear extra lines
-  const pressSpaceY = cy - 30 + extraLines.length * lineH + (extraLines.length > 0 ? 24 : 10);
+  const pressSpaceY = cy - 85 + extraLines.length * lineH + (extraLines.length > 0 ? 24 : 10);
   targetCtx.font = "22px monospace";
   targetCtx.fillStyle = "rgba(255,255,255,0.6)";
   targetCtx.fillText("Press space to continue...", cx, pressSpaceY);
@@ -981,7 +999,7 @@ const INTRO_LINES = [
   "",
   "Annie tar sina första stapplande steg i sitt rum.",
   "",
-  "I hörnet står en gammal garderob, ett arv från morfar.",
+  "I hörnet står en gammal garderob, ett arv från gammelfarfar.",
   "Den klickar och surrar på ett konstigt sätt.",
   "",
   "Annie är nyfiken. Annie är modig.",
@@ -990,12 +1008,12 @@ const INTRO_LINES = [
   "Det var ett misstag.",
   "",
   "Nu sitter hon fast i det förflutna, ",
-  "och hennes föräldrar har inte ens träffats ännu.",
+  "och hennes föräldrar har inte ens träffats än...",
   "",
   "Om hon inte fixar det...",
   "finns hon inte.",
   "",
-  "En stor uppgift för en liten tjej",
+  "En stor uppgift för en liten tjej men hon är bestämd",
 ];
 
 const INTRO_LINE_INTERVAL = 500;
