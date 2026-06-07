@@ -379,7 +379,6 @@ function render() {
     }
     drawSprite(ctx, trapdoor.sprite, trapdoor.x, trapdoor.y, T * S, T * S, "#553300");
   }
-  if (doorArrow && (!doorArrow.requiresUnlock || roomDoorUnlocked || codingDarkUnlocked)) drawSprite(ctx, doorArrow.sprite, doorArrow.x, doorArrow.y, T * S, T * S, "#ffffff");
   drawPlayer();
   if (ROOMS[currentRoomIndex].id === "coding_in_the_dark") {
     drawSpotlightOverlay(ctx, player, codingDarkUnlocked, trapdoorAboveOverlay ? trapdoor : null);
@@ -395,6 +394,7 @@ function render() {
     drawPustervikSign(ctx);
     drawYakiDaSign(ctx);
   }
+  if (doorArrow && (!doorArrow.requiresUnlock || roomDoorUnlocked || codingDarkUnlocked)) drawSprite(ctx, doorArrow.sprite, doorArrow.x, doorArrow.y, T * S, T * S, "#ffffff");
 
   if (gameState === "dissolving") {
     ctx.restore();
