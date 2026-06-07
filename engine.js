@@ -394,7 +394,7 @@ function render() {
     drawPustervikSign(ctx);
     drawYakiDaSign(ctx);
   }
-  if (doorArrow && (!doorArrow.requiresUnlock || roomDoorUnlocked || codingDarkUnlocked)) drawSprite(ctx, doorArrow.sprite, doorArrow.x, doorArrow.y, T * S, T * S, "#ffffff");
+  if (doorArrow && (!doorArrow.requiresUnlock || roomDoorUnlocked || trapdoorAboveOverlay)) drawSprite(ctx, doorArrow.sprite, doorArrow.x, doorArrow.y, T * S, T * S, "#ffffff");
 
   if (gameState === "dissolving") {
     ctx.restore();

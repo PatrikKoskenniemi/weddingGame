@@ -1001,7 +1001,7 @@ const INTRO_LINES = [
 const INTRO_LINE_INTERVAL = 500;
 
 function drawStartScreen(targetCtx, selectedItem, sprites) {
-  const panelCx = CANVAS_WIDTH / 6;
+  const panelCx = CANVAS_WIDTH / 4;
 
   targetCtx.fillStyle = "#07071a";
   targetCtx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
@@ -1011,7 +1011,7 @@ function drawStartScreen(targetCtx, selectedItem, sprites) {
     const scale = Math.max(CANVAS_WIDTH / bgImg.naturalWidth, CANVAS_HEIGHT / bgImg.naturalHeight);
     const dw = bgImg.naturalWidth * scale;
     const dh = bgImg.naturalHeight * scale;
-    targetCtx.drawImage(bgImg, (CANVAS_WIDTH - dw) / 3, (CANVAS_HEIGHT - dh) / 2, dw, dh);
+    targetCtx.drawImage(bgImg, (CANVAS_WIDTH - dw) / 3, (CANVAS_HEIGHT - dh) / 2 +50, dw, dh);
   }
 
   targetCtx.save();
@@ -1052,7 +1052,7 @@ function drawStartScreen(targetCtx, selectedItem, sprites) {
     const cx = CANVAS_WIDTH / 2;
     const gap = 100;
     drawSprite(targetCtx, sprites.gustav, cx - gap, charY, charW,  charH,  "#ff8844");
-    drawSprite(targetCtx, sprites.annie,  cx,        charY, smallW, smallH, "#4488ff");
+    drawSprite(targetCtx, sprites.annie,  cx,        charY +15, smallW, smallH, "#4488ff");
     drawSprite(targetCtx, sprites.elina,  cx + gap,  charY, charW,  charH,  "#ff8844");
   }
 }
