@@ -73,13 +73,18 @@ function spawnHearts(count) {
   const maxX = ROOM_BOUNDS.x + ROOM_BOUNDS.w - margin;
   const minY = ROOM_BOUNDS.y + ROOM_BOUNDS.wallHeight + margin;
   const maxY = ROOM_BOUNDS.y + ROOM_BOUNDS.h - margin;
+  const door = ROOMS[currentRoomIndex].door ? doorToCanvas(ROOMS[currentRoomIndex].door) : null;
+  const r = 32;
   for (let i = 0; i < count; i++) {
-    hearts.push({
-      x: Math.random() * (maxX - minX) + minX,
-      y: Math.random() * (maxY - minY) + minY,
-      size: 32,
-      sprite: createSpriteAnimation("heart", "pulse"),
-    });
+    let x, y, attempts = 0;
+    do {
+      x = Math.random() * (maxX - minX) + minX;
+      y = Math.random() * (maxY - minY) + minY;
+      attempts++;
+    } while (door && attempts < 50 &&
+      x > door.x - r && x < door.x + door.w + r &&
+      y > door.y - r && y < door.y + door.h + r);
+    hearts.push({ x, y, size: 32, sprite: createSpriteAnimation("heart", "pulse") });
   }
 }
 
@@ -430,7 +435,7 @@ function updateScriptedNpcs(deltaTime) {
       const dx = npc.targetX - npc.x;
       const dy = npc.targetY - npc.y;
       const dist = Math.sqrt(dx * dx + dy * dy);
-      const speed = 0.10;
+      const speed = 0.20;
       if (dist <= speed) {
         npc.x = npc.targetX;
         npc.y = npc.targetY;
