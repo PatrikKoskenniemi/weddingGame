@@ -16,14 +16,52 @@
       height: 100vh;
       overflow: hidden;
     }
+    #game-wrapper {
+      position: relative;
+      display: inline-block;
+      line-height: 0;
+    }
     canvas {
       display: block;
       border: 2px solid #333;
     }
+    #volume-control {
+      position: absolute;
+      top: 30px;
+      right: 30px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      color: #888;
+      font-size: 16px;
+      user-select: none;
+    }
+    #volume-slider {
+      writing-mode: vertical-lr;
+      direction: rtl;
+      appearance: slider-vertical;
+      width: 24px;
+      height: 120px;
+      cursor: pointer;
+      accent-color: #f0e040;
+    }
   </style>
 </head>
 <body>
-  <canvas id="gameCanvas" width="1280" height="768"></canvas>
+  <div id="game-wrapper">
+    <canvas id="gameCanvas" width="1280" height="768"></canvas>
+    <div id="volume-control">
+      <span>🔊</span>
+      <input id="volume-slider" type="range" min="0" max="1" step="0.01" value="1">
+      <span>🔇</span>
+    </div>
+  </div>
+  <script>
+    document.getElementById('volume-slider').addEventListener('input', function() {
+      SoundSystem.setVolume(parseFloat(this.value));
+    });
+  </script>
   <script src="hmr.js"></script>
   <script>const _v = Date.now();</script>
   <script>document.write('<script src="soundSystem.js?v='+_v+'"><\/script>');</script>

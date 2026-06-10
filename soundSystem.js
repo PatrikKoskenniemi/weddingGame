@@ -6,11 +6,14 @@
 
 const SoundSystem = (() => {
   let context = null;
+  let masterGain = null;
   const buffers = {};
 
   function getContext() {
     if (!context) {
       context = new (window.AudioContext || window.webkitAudioContext)();
+      masterGain = context.createGain();
+      masterGain.connect(context.destination);
     }
     return context;
   }
@@ -43,6 +46,11 @@ const SoundSystem = (() => {
       return getContext().resume().catch(() => {});
     },
 
+    setVolume(value) {
+      getContext();
+      masterGain.gain.value = value;
+    },
+
     play(key, { volume = 1, loop = false, offset = 0, stopOffset = null, fadeOutMs = 0 } = {}) {
       const ctx = getContext();
       if (!buffers[key]) return null;
@@ -55,7 +63,7 @@ const SoundSystem = (() => {
       const gain = ctx.createGain();
       gain.gain.value = volume;
       source.connect(gain);
-      gain.connect(ctx.destination);
+      gain.connect(masterGain);
 
       if (stopOffset !== null) {
         source.start(0, offset, stopOffset - offset);
