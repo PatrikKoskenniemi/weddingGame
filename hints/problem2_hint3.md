@@ -1,0 +1,1 @@
+When they are touching, push the character away: if `dx > 0` the character is to Annie's right — push it further right (`c.x += player.speed`). If `dx <= 0` push it left (`c.x -= player.speed`). Do the same for `dy`.

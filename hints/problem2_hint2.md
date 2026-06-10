@@ -1,0 +1,1 @@
+`dx = character.x - player.x` gives the horizontal gap. `Math.abs(dx)` removes the sign so you can compare it against the combined size. Do the same for `dy`. If both are within range, they are touching.

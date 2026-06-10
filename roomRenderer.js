@@ -99,7 +99,7 @@ const ROOMS = [
     completeLines: [
       "",
       "Musiken dunkar.",
-      "Mekaniska tangentbord ekrar i lokalen.",
+      "Mekaniska tangentbord ekar i lokalen.",
       "Publiken stirrar på skärmarna.",
       "",
       "Men Gustav och Elina stirrar inte på skärmarna.",
@@ -108,7 +108,7 @@ const ROOMS = [
       "",
       "Annie smiter diskret genom en lucka i golvet.",
       "",
-      "\"Detta måste ha fungerat.\"",
+      "\"Har jag rättat till tidslinjen nu?\"",
     ],
   },
   {
@@ -1159,7 +1159,7 @@ function drawRoomPopover(targetCtx, popover) {
   targetCtx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
   const panelW = 780;
-  const panelH = popover.height || 650;
+  const panelH = popover.height || 680;
   const px = cx - panelW / 2;
   const py = cy - panelH / 2;
 
