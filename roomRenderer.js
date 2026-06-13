@@ -64,7 +64,7 @@ const ROOMS = [
       "Det går bra till en början av dejtandet",
       "och Annie börjar undra varför hon bara är 2 år gammal.",
       "Men så händer något och mitt framför ögonen på Annie",
-      "och plötsligt tar relationen abrupt slut.",
+      "tar relationen abrupt slut.",
       "Vår hjältinna tvekar dock inte,",
       "hon kastar sig rakt in i nästa portal.",
       "",
